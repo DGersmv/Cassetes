@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кассеты - Расчёт</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 12px;
+            background: #f5f5f5;
+            color: #333;
+            padding: 10px;
+        }
+        .section {
+            background: white;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .params-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .param-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .param-row label {
+            min-width: 100px;
+            font-size: 11px;
+        }
+        .param-row input {
+            width: 70px;
+            padding: 4px 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .param-row span {
+            font-size: 10px;
+            color: #888;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        th, td {
+            padding: 6px 8px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .table-container {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .duplicate {
+            background: #ffebee !important;
+            color: #c62828;
+        }
+        .status {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .status.error {
+            color: #c62828;
+        }
+        .status.success {
+            color: #2e7d32;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .result-block {
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 8px;
+        }
+        .result-block h4 {
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .result-block ul {
+            list-style: none;
+            font-size: 11px;
+        }
+        .result-block li {
+            padding: 2px 0;
+        }
+        .hidden {
+            display: none;
+        }
+        #targetIds {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+        #targetIds .param-row input {
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Параметры -->
+    <div class="section">
+        <div class="section-title">Параметры</div>
+        
+        <!-- Общие параметры -->
+        <div style="margin-bottom: 10px;">
+            <div style="font-weight: bold; margin-bottom: 5px; font-size: 11px; color: #555;">Общие:</div>
+            <div class="params-grid">
+                <div class="param-row">
+                    <label>Высота этажа:</label>
+                    <input type="number" id="floorHeight" value="2.99" step="0.1">
+                    <span>м</span>
+                    <button class="btn btn-secondary" onclick="loadFloorHeight()" style="padding:4px 8px;font-size:10px;">↻</button>
+                </div>
+                <div class="param-row">
+                    <label>Низ плюс к низу этажа:</label>
+                    <input type="number" id="offsetX" value="165">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Верх плюс к высоте этажа:</label>
+                    <input type="number" id="offsetTop" value="745">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Смещение Y:</label>
+                    <input type="number" id="offsetY" value="50">
+                    <span>мм</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Параметры для типа 0 -->
+        <div style="margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+            <div style="font-weight: bold; margin-bottom: 5px; font-size: 11px; color: #555;">Параметры для типа 0:</div>
+            <div class="params-grid">
+                <div class="param-row">
+                    <label>Ширина планки:</label>
+                    <input type="number" id="plankWidth0" value="285">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Ширина откоса:</label>
+                    <input type="number" id="slopeWidth0" value="285">
+                    <span>мм</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Параметры для типов 1-2 -->
+        <div style="padding: 8px; background: #f8f9fa; border-radius: 4px;">
+            <div style="font-weight: bold; margin-bottom: 5px; font-size: 11px; color: #555;">Параметры для типов 1-2:</div>
+            <div class="params-grid">
+                <div class="param-row">
+                    <label>Ширина планки:</label>
+                    <input type="number" id="plankWidth12" value="160">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Ширина откоса:</label>
+                    <input type="number" id="slopeWidth12" value="225">
+                    <span>мм</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Окна/Двери -->
+    <div class="section">
+        <div class="section-title">Окна/Двери</div>
+        <div class="buttons" style="margin-bottom:8px;">
+            <button class="btn btn-primary" onclick="loadSelection()">Загрузить выделение</button>
+        </div>
+        <div class="table-container">
+            <table id="windowsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ширина</th>
+                        <th>Высота</th>
+                        <th>Подоконник</th>
+                        <th>Тип</th>
+                    </tr>
+                </thead>
+                <tbody id="windowsBody">
+                    <tr><td colspan="5" style="text-align:center;color:#999;">Нет данных</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="status" id="windowsStatus">Загружено: 0 элементов</div>
+    </div>
+
+    <!-- Кнопка расчёта -->
+    <div class="section">
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="calculate()" id="calcBtn">Рассчитать</button>
+            <button class="btn btn-success" onclick="writeResults()" id="writeBtn" disabled>Записать в объекты</button>
+            <button class="btn btn-secondary" onclick="exportCSV()" id="exportBtn" disabled>Экспорт CSV</button>
+            <button class="btn btn-secondary" onclick="importCSV()" id="importBtn">Импорт CSV</button>
+        </div>
+    </div>
+
+    <!-- Результаты и целевые объекты -->
+    <div class="section" id="resultsSection" style="display:none;">
+        <div class="section-title">Результаты и запись</div>
+        
+        <!-- Целевые объекты -->
+        <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+            <div style="font-weight: bold; margin-bottom: 8px; font-size: 11px;">Целевые объекты для записи:</div>
+            
+            <!-- Объекты для типа 0 -->
+            <div style="margin-bottom: 10px;">
+                <div style="font-weight: bold; margin-bottom: 5px; font-size: 10px; color: #666;">Объекты для типа 0:</div>
+                <div id="targetIds0" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div class="param-row">
+                        <label style="min-width: 80px;">Планки:</label>
+                        <input type="text" id="plankId0" value="OK-0_PLNK" style="flex: 1;">
+                    </div>
+                    <div class="param-row">
+                        <label style="min-width: 80px;">Л.откосы:</label>
+                        <input type="text" id="leftSlopeId0" value="OK-0_LOTK" style="flex: 1;">
+                    </div>
+                    <div class="param-row">
+                        <label style="min-width: 80px;">П.откосы:</label>
+                        <input type="text" id="rightSlopeId0" value="OK-0_ROTK" style="flex: 1;">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Объекты для типов 1-2 -->
+            <div>
+                <div style="font-weight: bold; margin-bottom: 5px; font-size: 10px; color: #666;">Объекты для типов 1-2:</div>
+                <div id="targetIds12" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div class="param-row">
+                        <label style="min-width: 80px;">Кассеты:</label>
+                        <input type="text" id="cassetteId12" value="OK-1_2_CASS" style="flex: 1;">
+                    </div>
+                    <div class="param-row">
+                        <label style="min-width: 80px;">Планки:</label>
+                        <input type="text" id="plankId12" value="OK-1_2_PLNK" style="flex: 1;">
+                    </div>
+                    <div class="param-row">
+                        <label style="min-width: 80px;">Л.откосы:</label>
+                        <input type="text" id="leftSlopeId12" value="OK-1_2_LOTK" style="flex: 1;">
+                    </div>
+                    <div class="param-row">
+                        <label style="min-width: 80px;">П.откосы:</label>
+                        <input type="text" id="rightSlopeId12" value="OK-1_2_ROTK" style="flex: 1;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Результаты -->
+        <div class="results-grid">
+            <div class="result-block" id="cassettesResult">
+                <h4>Кассеты</h4>
+                <ul id="cassettesList"></ul>
+            </div>
+            <div class="result-block">
+                <h4>Планки</h4>
+                <ul id="planksList"></ul>
+            </div>
+            <div class="result-block">
+                <h4>Левые откосы</h4>
+                <ul id="leftSlopesList"></ul>
+            </div>
+            <div class="result-block">
+                <h4>Правые откосы</h4>
+                <ul id="rightSlopesList"></ul>
+            </div>
+        </div>
+        <div class="status" id="resultsStatus"></div>
+    </div>
+
+    <script>
+        // Данные
+        let windowsData = [];
+        let calculationResult = null;
+
+        // Загрузить выделение
+        async function loadSelection() {
+            try {
+                document.getElementById('windowsStatus').textContent = 'Загрузка...';
+                document.getElementById('windowsStatus').className = 'status';
+                
+                // Проверяем, что ACAPI доступен
+                if (!window.ACAPI || !window.ACAPI.GetCassetteSelection) {
+                    throw new Error('ACAPI.GetCassetteSelection не доступен');
+                }
+                
+                // Вызываем функцию
+                let result;
+                try {
+                    result = window.ACAPI.GetCassetteSelection();
+                    // Если это Promise, ждём его
+                    if (result && typeof result.then === 'function') {
+                        result = await result;
+                    }
+                } catch (e) {
+                    throw new Error('Ошибка вызова GetCassetteSelection: ' + e.message);
+                }
+                
+                console.log('GetCassetteSelection result:', result);
+                console.log('result type:', typeof result);
+                console.log('result keys:', result ? Object.keys(result) : 'null');
+                console.log('result.windows:', result?.windows);
+                console.log('result.windows type:', typeof result?.windows);
+                console.log('result.windows isArray:', Array.isArray(result?.windows));
+                if (result?.windows) {
+                    console.log('result.windows.length:', result.windows.length);
+                    console.log('result.windows[0]:', result.windows[0]);
+                }
+                
+                if (!result) {
+                    throw new Error('Получен пустой результат');
+                }
+                
+                // Получаем windows из результата
+                let windowsArray = [];
+                if (result.windows) {
+                    // Проверяем разные способы доступа к массиву
+                    if (Array.isArray(result.windows)) {
+                        windowsArray = result.windows;
+                    } else if (result.windows.length !== undefined) {
+                        // Если есть свойство length, пытаемся преобразовать
+                        try {
+                            windowsArray = Array.from(result.windows);
+                        } catch (e) {
+                            console.warn('Не удалось преобразовать в массив через Array.from:', e);
+                            // Пытаемся получить через индексы
+                            windowsArray = [];
+                            for (let i = 0; i < result.windows.length; i++) {
+                                if (result.windows[i]) {
+                                    windowsArray.push(result.windows[i]);
+                                }
+                            }
+                        }
+                    } else if (typeof result.windows === 'object') {
+                        // Пытаемся получить как объект с индексами или итератор
+                        try {
+                            windowsArray = Object.values(result.windows);
+                        } catch (e) {
+                            console.warn('Не удалось получить через Object.values:', e);
+                        }
+                    } else {
+                        console.warn('result.windows не является массивом:', typeof result.windows, result.windows);
+                    }
+                }
+                
+                console.log('windowsArray length:', windowsArray.length);
+                
+                if (windowsArray.length > 0) {
+                    windowsData = windowsArray.map(w => ({
+                        id: w.id || '',
+                        width: parseFloat(w.width) || 0,
+                        height: parseFloat(w.height) || 0,
+                        sillHeight: parseFloat(w.sillHeight) || 0,
+                        calcType: parseInt(w.calcType) || 0
+                    }));
+                    
+                    updateWindowsTable();
+                    document.getElementById('windowsStatus').textContent = 
+                        `Загружено: ${windowsData.length} элементов`;
+                    document.getElementById('windowsStatus').className = 'status success';
+                    
+                    // Показываем предупреждение о дубликатах
+                    if (result.duplicates && result.duplicates.length > 0) {
+                        const dupMsg = `Найдены дубликаты ID: ${result.duplicates.join(', ')}`;
+                        document.getElementById('windowsStatus').textContent += '. ' + dupMsg;
+                        document.getElementById('windowsStatus').className = 'status error';
+                    }
+                } else {
+                    windowsData = [];
+                    updateWindowsTable();
+                    const count = result.count || 0;
+                    document.getElementById('windowsStatus').textContent = 
+                        `Нет подходящих элементов (найдено окон/дверей: ${count})`;
+                    document.getElementById('windowsStatus').className = 'status';
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки выделения:', e);
+                document.getElementById('windowsStatus').textContent = 'Ошибка загрузки: ' + e.message;
+                document.getElementById('windowsStatus').className = 'status error';
+            }
+        }
+
+        // Обновить таблицу окон
+        function updateWindowsTable() {
+            const tbody = document.getElementById('windowsBody');
+            
+            if (windowsData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;">Нет данных</td></tr>';
+                return;
+            }
+            
+            // Находим дубликаты
+            const idCount = {};
+            windowsData.forEach(w => idCount[w.id] = (idCount[w.id] || 0) + 1);
+            
+            tbody.innerHTML = windowsData.map(w => {
+                const isDuplicate = idCount[w.id] > 1;
+                return `<tr class="${isDuplicate ? 'duplicate' : ''}">
+                    <td>${isDuplicate ? '🔴 ' : ''}${w.id}</td>
+                    <td>${w.width.toFixed(3)}</td>
+                    <td>${w.height.toFixed(3)}</td>
+                    <td>${w.sillHeight.toFixed(3)}</td>
+                    <td>Тип ${w.calcType}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // Загрузить высоту этажа
+        async function loadFloorHeight() {
+            try {
+                if (!window.ACAPI || !window.ACAPI.GetFloorHeightFromWall) {
+                    console.warn('ACAPI.GetFloorHeightFromWall не доступен');
+                    return;
+                }
+                
+                const result = await window.ACAPI.GetFloorHeightFromWall('СН-МД1');
+                console.log('GetFloorHeightFromWall result:', result);
+                
+                if (result && result.found && result.height > 0) {
+                    document.getElementById('floorHeight').value = result.height.toFixed(2);
+                    showStatus('Высота этажа загружена: ' + result.height.toFixed(2) + ' м');
+                } else {
+                    document.getElementById('floorHeight').value = '2.99';
+                    showStatus('Используется значение по умолчанию 2.99 м', false);
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки высоты этажа:', e);
+                document.getElementById('floorHeight').value = '2.99';
+                showStatus('Ошибка загрузки высоты этажа: ' + e.message, true);
+            }
+        }
+        
+        // Вспомогательная функция для показа статуса
+        function showStatus(message, isError = false) {
+            const statusEl = document.getElementById('windowsStatus');
+            if (statusEl) {
+                statusEl.textContent = message;
+                statusEl.className = isError ? 'status error' : 'status success';
+            }
+        }
+
+        // Рассчитать
+        async function calculate() {
+            if (windowsData.length === 0) {
+                alert('Сначала загрузите выделение');
+                return;
+            }
+            
+            const params = {
+                type: 3,  // Type1And2 - обрабатываем все элементы
+                floorHeight: parseFloat(document.getElementById('floorHeight').value),
+                plankWidth0: parseInt(document.getElementById('plankWidth0').value),
+                slopeWidth0: parseInt(document.getElementById('slopeWidth0').value),
+                plankWidth12: parseInt(document.getElementById('plankWidth12').value),
+                slopeWidth12: parseInt(document.getElementById('slopeWidth12').value),
+                offsetX: parseInt(document.getElementById('offsetX').value),
+                offsetY: parseInt(document.getElementById('offsetY').value),
+                offsetTop: parseInt(document.getElementById('offsetTop').value)
+            };
+            
+            try {
+                // Вызываем C++ функцию расчёта
+                const result = await window.ACAPI.CalculateCassettes({ 
+                    windows: windowsData, 
+                    params: params 
+                });
+                
+                if (result && result.success) {
+                    calculationResult = {
+                        cassettes: result.cassettes || [],
+                        planks: result.planks || [],
+                        leftSlopes: result.leftSlopes || [],
+                        rightSlopes: result.rightSlopes || [],
+                        duplicates: result.duplicates || []
+                    };
+                    
+                    displayResults();
+                    document.getElementById('writeBtn').disabled = false;
+                    document.getElementById('exportBtn').disabled = false;
+                    document.getElementById('resultsStatus').textContent = 'Расчёт выполнен успешно';
+                    document.getElementById('resultsStatus').className = 'status success';
+                } else {
+                    document.getElementById('resultsStatus').textContent = 
+                        'Ошибка расчёта: ' + (result?.errorMessage || 'Неизвестная ошибка');
+                    document.getElementById('resultsStatus').className = 'status error';
+                }
+            } catch (e) {
+                document.getElementById('resultsStatus').textContent = 'Ошибка расчёта: ' + e;
+                document.getElementById('resultsStatus').className = 'status error';
+            }
+        }
+
+        // Локальный расчёт (дублирует логику C++)
+        function localCalculate(windows, params) {
+            const result = { cassettes: [], planks: [], leftSlopes: [], rightSlopes: [] };
+            const cassetteGroups = {};
+            const plankGroups = {};
+            const leftSlopeGroups = {};
+            const rightSlopeGroups = {};
+            
+            for (const w of windows) {
+                // Обрабатываем все элементы подряд, применяя логику по типу элемента
+                
+                // Планки
+                const plankLength = Math.round(w.width * 1000) + params.offsetY;
+                plankGroups[plankLength] = (plankGroups[plankLength] || 0) + 2;
+                
+                // Откосы
+                const slopeLength = Math.round(w.height * 1000);
+                leftSlopeGroups[slopeLength] = (leftSlopeGroups[slopeLength] || 0) + 1;
+                rightSlopeGroups[slopeLength] = (rightSlopeGroups[slopeLength] || 0) + 1;
+                
+                // Кассеты (типы 1 и 2)
+                if (w.calcType === 1 || w.calcType === 2) {
+                    const cassetteX = Math.round(w.sillHeight * 1000) + params.offsetX;
+                    const cassetteY = Math.round(w.width * 1000) + params.offsetY;
+                    const key = `${cassetteX}x${cassetteY}`;
+                    cassetteGroups[key] = (cassetteGroups[key] || 0) + 1;
+                    
+                    if (w.calcType === 2) {
+                        const cassetteX2 = Math.round(params.floorHeight * 1000) 
+                            - (190 + Math.round(w.height * 1000) + Math.round(w.sillHeight * 1000) + 20) 
+                            + params.offsetTop;
+                        const key2 = `${cassetteX2}x${cassetteY}`;
+                        cassetteGroups[key2] = (cassetteGroups[key2] || 0) + 1;
+                    }
+                }
+            }
+            
+            // Конвертируем в массивы
+            for (const [key, count] of Object.entries(cassetteGroups)) {
+                const [x, y] = key.split('x').map(Number);
+                result.cassettes.push({ x, y, count });
+            }
+            for (const [length, count] of Object.entries(plankGroups)) {
+                result.planks.push({ width: params.plankWidth, length: parseInt(length), count });
+            }
+            for (const [length, count] of Object.entries(leftSlopeGroups)) {
+                result.leftSlopes.push({ width: params.slopeWidth, length: parseInt(length), count });
+            }
+            for (const [length, count] of Object.entries(rightSlopeGroups)) {
+                result.rightSlopes.push({ width: params.slopeWidth, length: parseInt(length), count });
+            }
+            
+            return result;
+        }
+
+        // Отобразить результаты
+        function displayResults() {
+            document.getElementById('resultsSection').style.display = 'block';
+            
+            // Кассеты (показываем всегда, если есть)
+            document.getElementById('cassettesList').innerHTML = 
+                calculationResult.cassettes.map(c => 
+                    `<li>${c.x}×${c.y} мм: ${c.count} шт.</li>`
+                ).join('') || '<li>Нет</li>';
+            
+            // Планки (показываем всегда)
+            document.getElementById('planksList').innerHTML = 
+                calculationResult.planks.map(p => 
+                    `<li>${p.width}×${p.length} мм: ${p.count} шт.</li>`
+                ).join('') || '<li>Нет</li>';
+            
+            // Откосы (показываем всегда)
+            document.getElementById('leftSlopesList').innerHTML = 
+                calculationResult.leftSlopes.map(s => 
+                    `<li>${s.width}×${s.length} мм: ${s.count} шт.</li>`
+                ).join('') || '<li>Нет</li>';
+            
+            document.getElementById('rightSlopesList').innerHTML = 
+                calculationResult.rightSlopes.map(s => 
+                    `<li>${s.width}×${s.length} мм: ${s.count} шт.</li>`
+                ).join('') || '<li>Нет</li>';
+        }
+
+        // Записать результаты
+        async function writeResults() {
+            if (!calculationResult) return;
+            
+            const targets = {
+                // Объекты для типа 0
+                plankId0: document.getElementById('plankId0').value,
+                leftSlopeId0: document.getElementById('leftSlopeId0').value,
+                rightSlopeId0: document.getElementById('rightSlopeId0').value,
+                // Объекты для типов 1-2
+                cassetteId12: document.getElementById('cassetteId12').value,
+                plankId12: document.getElementById('plankId12').value,
+                leftSlopeId12: document.getElementById('leftSlopeId12').value,
+                rightSlopeId12: document.getElementById('rightSlopeId12').value
+            };
+            
+            try {
+                const result = await window.ACAPI.WriteCassetteResults({ 
+                    result: calculationResult, 
+                    targets: targets,
+                    params: { type: 3 }  // Type1And2 - обрабатываем все элементы
+                });
+                
+                if (result && result.success) {
+                    document.getElementById('resultsStatus').textContent = 'Результаты записаны в объекты';
+                    document.getElementById('resultsStatus').className = 'status success';
+                } else {
+                    document.getElementById('resultsStatus').textContent = 
+                        'Ошибка записи: ' + (result?.errorMessage || 'Неизвестная ошибка');
+                    document.getElementById('resultsStatus').className = 'status error';
+                }
+            } catch (e) {
+                document.getElementById('resultsStatus').textContent = 'Ошибка записи: ' + e;
+                document.getElementById('resultsStatus').className = 'status error';
+            }
+        }
+
+        // Экспорт CSV
+        function exportCSV() {
+            if (!calculationResult) {
+                alert('Сначала выполните расчёт');
+                return;
+            }
+            
+            // Формируем CSV с более подробной информацией, включая тип элемента
+            let csv = 'Тип;Тип элемента;Размер X;Размер Y;Количество;Описание\n';
+            
+            calculationResult.cassettes.forEach(c => {
+                csv += `Кассета;1-2;${c.x};${c.y};${c.count};Размер: U x V : ${c.x}x${c.y} мм; Количество: ${c.count} шт.\n`;
+            });
+            calculationResult.planks.forEach(p => {
+                const elemType = (p.calcType === 0) ? '0' : '1-2';
+                csv += `Планка;${elemType};${p.width};${p.length};${p.count};Размер: ${p.width}x${p.length} мм; Длина ${p.calcType === 0 ? 'Z' : 'W'} = ${p.length} мм; Количество: ${p.count} шт.\n`;
+            });
+            calculationResult.leftSlopes.forEach(s => {
+                const elemType = (s.calcType === 0) ? '0' : '1-2';
+                csv += `Левый откос;${elemType};${s.width};${s.length};${s.count};Размер: ${s.width}x${s.length} мм; Длина Z = ${s.length} мм; Количество: ${s.count} шт.\n`;
+            });
+            calculationResult.rightSlopes.forEach(s => {
+                const elemType = (s.calcType === 0) ? '0' : '1-2';
+                csv += `Правый откос;${elemType};${s.width};${s.length};${s.count};Размер: ${s.width}x${s.length} мм; Длина Z = ${s.length} мм; Количество: ${s.count} шт.\n`;
+            });
+            
+            // Скачиваем файл
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            link.download = `cassettes_export_${timestamp}.csv`;
+            link.click();
+            
+            showStatus('CSV файл экспортирован', false);
+        }
+
+        // Импорт CSV
+        function importCSV() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const text = event.target.result;
+                        // Убираем BOM если есть
+                        const csvText = text.replace(/^\ufeff/, '');
+                        const lines = csvText.split('\n').filter(line => line.trim());
+                        
+                        if (lines.length < 2) {
+                            throw new Error('Файл слишком короткий или пустой');
+                        }
+                        
+                        // Парсим заголовок
+                        const header = lines[0].split(';');
+                        const typeIdx = header.indexOf('Тип');
+                        const elemTypeIdx = header.indexOf('Тип элемента');
+                        const sizeXIdx = header.indexOf('Размер X');
+                        const sizeYIdx = header.indexOf('Размер Y');
+                        const countIdx = header.indexOf('Количество');
+                        
+                        // Поддержка старого формата без "Тип элемента"
+                        const hasElemType = elemTypeIdx !== -1;
+                        
+                        if (typeIdx === -1 || sizeXIdx === -1 || countIdx === -1) {
+                            throw new Error('Неверный формат CSV файла. Ожидаются колонки: Тип, Размер X, Размер Y, Количество');
+                        }
+                        
+                        // Парсим данные
+                        const imported = {
+                            cassettes: [],
+                            planks: [],
+                            leftSlopes: [],
+                            rightSlopes: []
+                        };
+                        
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = lines[i].split(';');
+                            if (cols.length < 4) continue;
+                            
+                            const type = cols[typeIdx]?.trim();
+                            const elemTypeStr = hasElemType ? (cols[elemTypeIdx]?.trim() || '') : '';
+                            const sizeX = parseInt(cols[sizeXIdx]?.trim() || '0');
+                            const sizeY = parseInt(cols[sizeYIdx]?.trim() || '0');
+                            const count = parseInt(cols[countIdx]?.trim() || '0');
+                            
+                            if (!type || !count || count <= 0) continue;
+                            
+                            // Определяем calcType: 0 для типа 0, 1 для типов 1-2
+                            let calcType = 0;
+                            if (hasElemType) {
+                                if (elemTypeStr === '1-2' || elemTypeStr === '1' || elemTypeStr === '2') {
+                                    calcType = 1;
+                                } else if (elemTypeStr === '0') {
+                                    calcType = 0;
+                                } else {
+                                    // Если тип элемента не указан, определяем по ширине
+                                    // Тип 0: планки 285, откосы 285
+                                    // Типы 1-2: планки 160, откосы 225
+                                    if (sizeX === 160 || sizeX === 225) {
+                                        calcType = 1;
+                                    } else {
+                                        calcType = 0;
+                                    }
+                                }
+                            } else {
+                                // Старый формат: определяем по ширине
+                                if (sizeX === 160 || sizeX === 225) {
+                                    calcType = 1;
+                                } else {
+                                    calcType = 0;
+                                }
+                            }
+                            
+                            if (type === 'Кассета') {
+                                imported.cassettes.push({ x: sizeX, y: sizeY, count: count });
+                            } else if (type === 'Планка') {
+                                imported.planks.push({ width: sizeX, length: sizeY || sizeX, count: count, calcType: calcType });
+                            } else if (type === 'Левый откос') {
+                                imported.leftSlopes.push({ width: sizeX, length: sizeY || sizeX, count: count, calcType: calcType });
+                            } else if (type === 'Правый откос') {
+                                imported.rightSlopes.push({ width: sizeX, length: sizeY || sizeX, count: count, calcType: calcType });
+                            }
+                        }
+                        
+                        // Проверяем что есть данные
+                        const total = imported.cassettes.length + imported.planks.length + 
+                                     imported.leftSlopes.length + imported.rightSlopes.length;
+                        if (total === 0) {
+                            throw new Error('В файле не найдено данных для импорта');
+                        }
+                        
+                        // Устанавливаем импортированные данные как результат расчёта
+                        calculationResult = imported;
+                        displayResults();
+                        document.getElementById('writeBtn').disabled = false;
+                        document.getElementById('exportBtn').disabled = false;
+                        
+                        showStatus(`Импортировано: ${total} записей (Кассет: ${imported.cassettes.length}, Планок: ${imported.planks.length}, Откосов: ${imported.leftSlopes.length + imported.rightSlopes.length})`, false);
+                        
+                    } catch (error) {
+                        showStatus('Ошибка импорта: ' + error.message, true);
+                        console.error('Ошибка импорта CSV:', error);
+                    }
+                };
+                
+                reader.onerror = function() {
+                    showStatus('Ошибка чтения файла', true);
+                };
+                
+                reader.readAsText(file, 'UTF-8');
+            };
+            
+            input.click();
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            // Все элементы видны по умолчанию
+        });
+    </script>
+</body>
+</html>

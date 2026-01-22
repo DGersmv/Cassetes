@@ -1,0 +1,26 @@
+/* *****************************************************************************
+// Cassette Panel Add-On - Non-localizable resource description
+// ****************************************************************************/
+
+#include "MDIDs_APICD.h"
+
+'MDID' 32500 "Add-On Identifier" {
+	909404777
+	4057747693_Cassetes
+}
+
+/* --- HTML Resources --- */
+
+'DATA' 32730 "Cassette Palette Html" {
+	"Cassette_Palette.html"
+}
+
+'DATA' 32740 "Cassette Settings Palette Html" {
+	"Cassette_Settings.html"
+}
+
+/* --- Icons --- */
+
+'GICN' 32750 "Close Icon" {
+	"Close"
+}

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кассеты - Настройки</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 12px;
+            background: #f5f5f5;
+            color: #333;
+            padding: 10px;
+        }
+        .section {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #555;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .params-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        .param-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .param-row label {
+            min-width: 140px;
+            font-size: 11px;
+        }
+        .param-row input[type="number"],
+        .param-row input[type="text"] {
+            width: 100px;
+            padding: 4px 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .param-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+        .param-row span {
+            font-size: 10px;
+            color: #888;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .status {
+            font-size: 11px;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab:hover {
+            background: #f0f0f0;
+        }
+        .tab.active {
+            border-bottom-color: #007bff;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Общие настройки -->
+    <div class="section">
+        <div class="section-title">Общие настройки</div>
+        <div class="params-grid">
+            <div class="param-row">
+                <label>Тип по умолчанию:</label>
+                <select id="defaultType">
+                    <option value="0">Тип 0 (планки+откосы)</option>
+                    <option value="1">Тип 1 (одна кассета)</option>
+                    <option value="2">Тип 2 (две кассеты)</option>
+                </select>
+            </div>
+            <div class="param-row">
+                <label>ID стены для высоты:</label>
+                <input type="text" id="wallIdForFloorHeight" value="СН-МД1">
+            </div>
+            <div class="param-row">
+                <label>Предупреждать о дубликатах:</label>
+                <input type="checkbox" id="showDuplicateWarning" checked>
+            </div>
+        </div>
+    </div>
+
+    <!-- Настройки по типам -->
+    <div class="section">
+        <div class="tabs">
+            <div class="tab active" data-tab="type0">Тип 0</div>
+            <div class="tab" data-tab="type12">Типы 1/2</div>
+        </div>
+
+        <!-- Тип 0 -->
+        <div class="tab-content active" id="type0">
+            <div class="section-title">Настройки Тип 0</div>
+            <div class="params-grid">
+                <div class="param-row">
+                    <label>Ширина планки:</label>
+                    <input type="number" id="type0_plankWidth" value="285">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Ширина откоса:</label>
+                    <input type="number" id="type0_slopeWidth" value="285">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Смещение X:</label>
+                    <input type="number" id="type0_offsetX" value="165">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Смещение Y:</label>
+                    <input type="number" id="type0_offsetY" value="50">
+                    <span>мм</span>
+                </div>
+            </div>
+            <div class="section-title" style="margin-top:15px;">Целевые объекты (Тип 0)</div>
+            <div class="params-grid">
+                <div class="param-row">
+                    <label>ID планки:</label>
+                    <input type="text" id="type0_plankId" value="OK-0_PLNK">
+                </div>
+                <div class="param-row">
+                    <label>ID левого откоса:</label>
+                    <input type="text" id="type0_leftSlopeId" value="OK-0_LOTK">
+                </div>
+                <div class="param-row">
+                    <label>ID правого откоса:</label>
+                    <input type="text" id="type0_rightSlopeId" value="OK-0_ROTK">
+                </div>
+            </div>
+        </div>
+
+        <!-- Типы 1/2 -->
+        <div class="tab-content" id="type12">
+            <div class="section-title">Настройки Типы 1/2</div>
+            <div class="params-grid">
+                <div class="param-row">
+                    <label>Ширина планки:</label>
+                    <input type="number" id="type12_plankWidth" value="160">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Ширина откоса:</label>
+                    <input type="number" id="type12_slopeWidth" value="225">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Смещение X:</label>
+                    <input type="number" id="type12_offsetX" value="165">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Смещение Y:</label>
+                    <input type="number" id="type12_offsetY" value="50">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Коэффициент X2:</label>
+                    <input type="number" id="type12_x2Coeff" value="745">
+                    <span>мм</span>
+                </div>
+            </div>
+            <div class="section-title" style="margin-top:15px;">Целевые объекты (Типы 1/2)</div>
+            <div class="params-grid">
+                <div class="param-row">
+                    <label>ID кассеты:</label>
+                    <input type="text" id="type12_cassetteId" value="OK-1_2_CASS">
+                </div>
+                <div class="param-row">
+                    <label>ID планки:</label>
+                    <input type="text" id="type12_plankId" value="OK-1_2_PLNK">
+                </div>
+                <div class="param-row">
+                    <label>ID левого откоса:</label>
+                    <input type="text" id="type12_leftSlopeId" value="OK-1_2_LOTK">
+                </div>
+                <div class="param-row">
+                    <label>ID правого откоса:</label>
+                    <input type="text" id="type12_rightSlopeId" value="OK-1_2_ROTK">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кнопки -->
+    <div class="buttons">
+        <button class="btn btn-primary" onclick="saveSettings()">Сохранить</button>
+        <button class="btn btn-secondary" onclick="loadSettings()">Загрузить</button>
+        <button class="btn btn-secondary" onclick="resetDefaults()">По умолчанию</button>
+    </div>
+
+    <div id="status"></div>
+
+    <script>
+        // Переключение табов
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(this.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Собрать настройки из формы
+        function collectSettings() {
+            return {
+                defaultType: parseInt(document.getElementById('defaultType').value),
+                wallIdForFloorHeight: document.getElementById('wallIdForFloorHeight').value,
+                showDuplicateWarning: document.getElementById('showDuplicateWarning').checked,
+                type0: {
+                    plankWidth: parseInt(document.getElementById('type0_plankWidth').value),
+                    slopeWidth: parseInt(document.getElementById('type0_slopeWidth').value),
+                    offsetX: parseInt(document.getElementById('type0_offsetX').value),
+                    offsetY: parseInt(document.getElementById('type0_offsetY').value),
+                    cassetteId: '',
+                    plankId: document.getElementById('type0_plankId').value,
+                    leftSlopeId: document.getElementById('type0_leftSlopeId').value,
+                    rightSlopeId: document.getElementById('type0_rightSlopeId').value
+                },
+                type1_2: {
+                    plankWidth: parseInt(document.getElementById('type12_plankWidth').value),
+                    slopeWidth: parseInt(document.getElementById('type12_slopeWidth').value),
+                    offsetX: parseInt(document.getElementById('type12_offsetX').value),
+                    offsetY: parseInt(document.getElementById('type12_offsetY').value),
+                    x2Coeff: parseInt(document.getElementById('type12_x2Coeff').value),
+                    cassetteId: document.getElementById('type12_cassetteId').value,
+                    plankId: document.getElementById('type12_plankId').value,
+                    leftSlopeId: document.getElementById('type12_leftSlopeId').value,
+                    rightSlopeId: document.getElementById('type12_rightSlopeId').value
+                }
+            };
+        }
+
+        // Применить настройки к форме
+        function applySettings(settings) {
+            document.getElementById('defaultType').value = settings.defaultType;
+            document.getElementById('wallIdForFloorHeight').value = settings.wallIdForFloorHeight;
+            document.getElementById('showDuplicateWarning').checked = settings.showDuplicateWarning;
+            
+            // Тип 0
+            document.getElementById('type0_plankWidth').value = settings.type0.plankWidth;
+            document.getElementById('type0_slopeWidth').value = settings.type0.slopeWidth;
+            document.getElementById('type0_offsetX').value = settings.type0.offsetX;
+            document.getElementById('type0_offsetY').value = settings.type0.offsetY;
+            document.getElementById('type0_plankId').value = settings.type0.plankId;
+            document.getElementById('type0_leftSlopeId').value = settings.type0.leftSlopeId;
+            document.getElementById('type0_rightSlopeId').value = settings.type0.rightSlopeId;
+            
+            // Тип 1/2
+            document.getElementById('type12_plankWidth').value = settings.type1_2.plankWidth;
+            document.getElementById('type12_slopeWidth').value = settings.type1_2.slopeWidth;
+            document.getElementById('type12_offsetX').value = settings.type1_2.offsetX;
+            document.getElementById('type12_offsetY').value = settings.type1_2.offsetY;
+            document.getElementById('type12_x2Coeff').value = settings.type1_2.x2Coeff;
+            document.getElementById('type12_cassetteId').value = settings.type1_2.cassetteId;
+            document.getElementById('type12_plankId').value = settings.type1_2.plankId;
+            document.getElementById('type12_leftSlopeId').value = settings.type1_2.leftSlopeId;
+            document.getElementById('type12_rightSlopeId').value = settings.type1_2.rightSlopeId;
+        }
+
+        // Настройки по умолчанию
+        function getDefaultSettings() {
+            return {
+                defaultType: 0,
+                wallIdForFloorHeight: 'СН-МД1',
+                showDuplicateWarning: true,
+                type0: {
+                    plankWidth: 285,
+                    slopeWidth: 285,
+                    offsetX: 165,
+                    offsetY: 50,
+                    cassetteId: '',
+                    plankId: 'OK-0_PLNK',
+                    leftSlopeId: 'OK-0_LOTK',
+                    rightSlopeId: 'OK-0_ROTK'
+                },
+                type1_2: {
+                    plankWidth: 160,
+                    slopeWidth: 225,
+                    offsetX: 165,
+                    offsetY: 50,
+                    x2Coeff: 745,
+                    cassetteId: 'OK-1_2_CASS',
+                    plankId: 'OK-1_2_PLNK',
+                    leftSlopeId: 'OK-1_2_LOTK',
+                    rightSlopeId: 'OK-1_2_ROTK'
+                }
+            };
+        }
+
+        // Показать статус
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + (isError ? 'error' : 'success');
+            setTimeout(() => { status.className = ''; status.textContent = ''; }, 3000);
+        }
+
+        // Сохранить настройки
+        async function saveSettings() {
+            const settings = collectSettings();
+            try {
+                // TODO: Вызвать SaveCassetteSettings через ACAPI
+                // await window.ACAPI.SaveCassetteSettings(settings);
+                
+                // Пока сохраняем в localStorage
+                localStorage.setItem('cassetteSettings', JSON.stringify(settings));
+                showStatus('Настройки сохранены');
+            } catch (e) {
+                showStatus('Ошибка сохранения: ' + e, true);
+            }
+        }
+
+        // Загрузить настройки
+        async function loadSettings() {
+            try {
+                // TODO: Вызвать GetCassetteSettings через ACAPI
+                // const settings = await window.ACAPI.GetCassetteSettings();
+                
+                // Пока из localStorage
+                const stored = localStorage.getItem('cassetteSettings');
+                const settings = stored ? JSON.parse(stored) : getDefaultSettings();
+                applySettings(settings);
+                showStatus('Настройки загружены');
+            } catch (e) {
+                showStatus('Ошибка загрузки: ' + e, true);
+            }
+        }
+
+        // Сбросить к defaults
+        function resetDefaults() {
+            applySettings(getDefaultSettings());
+            showStatus('Настройки сброшены');
+        }
+
+        // Загружаем настройки при старте
+        document.addEventListener('DOMContentLoaded', loadSettings);
+    </script>
+</body>
+</html>

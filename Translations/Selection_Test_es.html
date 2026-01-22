@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Landscape Helper</title>
+
+  <style>
+    body { font-family: Arial, sans-serif; background:#f5f5f5; margin:20px; }
+    
+    /* LANDSCAPE HELPER Logo */
+    .logo-container { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      margin: 0 auto 25px; 
+      padding: 20px 25px; 
+      background: linear-gradient(135deg, #f5f3ee 0%, #ebe8e0 100%);
+      border: 1px solid #d4d0c7;
+      border-radius: 12px; 
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+      max-width: 650px;
+      position: relative;
+      overflow: hidden;
+    }
+    .logo-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(79, 96, 79, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(110, 128, 110, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .logo-icon { 
+      width: 70px; 
+      height: 70px; 
+      background: #4F604F;
+      border: 2px solid #4F604F;
+      border-radius: 12px;
+      position: relative;
+      margin-right: 20px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #6E806E 0%, #6E806E 45%, #4F604F 45%, #4F604F 100%);
+      border-radius: 10px;
+    }
+    .logo-icon::after {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      width: 16px;
+      height: 16px;
+      background: #6E806E;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .logo-icon .mountain {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-bottom: 18px solid #6E806E;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .logo-text { 
+      color: #4F604F; 
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      font-weight: 700;
+      text-align: left;
+      position: relative;
+      z-index: 1;
+    }
+    .logo-title { 
+      font-size: 28px; 
+      line-height: 1.0; 
+      margin: 0; 
+      letter-spacing: 1.2px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      text-transform: uppercase;
+    }
+    .logo-subtitle { 
+      font-size: 13px; 
+      margin: 4px 0 0 0; 
+      letter-spacing: 0.8px;
+      opacity: 0.85;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    
+    table.selection-table { border-collapse:collapse; margin:0 auto 20px; width:80%; max-width:800px; background:#fff; font-size:11px; }
+    table.selection-table th, table.selection-table td { border:1px solid #888; padding:6px 10px; text-align:center; }
+    table.selection-table thead { background:#f0f0f0; font-weight:bold; }
+    .tabs { text-align:center; margin-bottom:10px; }
+    .tablink { display:inline-block; padding:8px 16px; margin:0 4px; border:0; border-radius:4px 4px 0 0; background:#ddd; cursor:pointer; font-size:14px; }
+    .tablink.active { background:#366536; color:#fff; }
+    .tabcontent { display:none; position:relative; }
+    fieldset.control-block { display:block; margin:15px auto; padding:15px; width:400px; max-width:95%; border:1px solid #aaa; border-radius:6px; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,.1); }
+    fieldset.control-block legend { font-weight:bold; }
+    fieldset.control-block label { display:inline-block; width:140px; text-align:right; margin-right:8px; }
+    fieldset.control-block input[type="number"] { width:120px; padding:3px; margin:3px 0; }
+    fieldset.control-block input[type="button"] { margin:4px 0; padding:4px 10px; cursor:pointer; }
+    .info-box { margin-top:10px; padding:6px; background:#f9f9f9; border:1px dashed #aaa; font-size:12px; min-height:30px; white-space:pre-wrap; }
+    a { display:block; text-align:center; margin-top:20px; }
+    .tab-help { position:absolute; right:10px; bottom:10px; padding:8px 12px; border:0; border-radius:8px; background:#366536; color:#fff; font-weight:600; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.2); }
+    .tab-help:hover { filter:brightness(1.05); }
+    .tab-help:active { transform:translateY(1px); }
+    .palette-launchers { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin:0 auto 20px; }
+    .palette-button { padding:10px 24px; border:0; border-radius:8px; background:#366536; color:#fff; font-weight:600; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.2); transition:filter .15s ease, transform .15s ease; }
+    .palette-button:hover { filter:brightness(1.1); }
+    .palette-button:active { transform:translateY(1px); }
+
+    /* Black log strip */
+    #log-box { 
+      margin-top:10px; 
+      padding:8px; 
+      background:#111; 
+      color:#0f0; 
+      font-family:monospace; 
+      font-size:12px; 
+      height:140px; 
+      overflow:auto; 
+      display:none; /* Скрыто по умолчанию, будет показано в Debug версии через C++ код */
+    }
+    .muted { opacity:.6; }
+  </style>
+
+  <script type="text/javascript">
+    "use strict";
+
+    // ================= helpers =================
+    let logBuffer = ''; // Буфер для логов (скорость!)
+    
+    function AddLog(msg) {
+      // Log to console
+      try { console.log(String(msg)); } catch(_) {}
+      
+      // Also log to UI
+      const box = document.getElementById('log-box');
+      if (!box) return;
+      
+      const now = new Date().toLocaleTimeString();
+      logBuffer += "\n[" + now + "] " + msg;
+      
+      // Ограничиваем буфер (макс 5000 символов)
+      if (logBuffer.length > 5000) {
+        logBuffer = logBuffer.substring(logBuffer.length - 4000);
+      }
+      
+      // Применяем одним обновлением
+      box.textContent = logBuffer;
+      box.scrollTop = box.scrollHeight;
+    }
+    
+    function setInfo(id, msg) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = msg;
+    }
+    function parseNumber(inputEl, def = 0) {
+      let v = (typeof inputEl.valueAsNumber === 'number' && !isNaN(inputEl.valueAsNumber)) ? inputEl.valueAsNumber : NaN;
+      if (isNaN(v)) {
+        const p = parseFloat(String(inputEl.value || "").replace(',', '.'));
+        v = Number.isFinite(p) ? p : def;
+      }
+      return v;
+    }
+
+    // Global variable for storing the last applied markup step
+    let g_lastMarkupStepMm = 2500; // Default value
+
+    // =============== ACAPI bridge waiting (with diagnostics) ===============
+    function whenACAPIReadyDo(cb) {
+      let fired = false;
+      const probe = () => {
+        const A = window.ACAPI;
+        if (!A) return null;
+        return {
+          hasSelect : typeof A.GetSelectedElements === 'function',
+          hasGround : typeof A.ApplyGroundOffset  === 'function',
+          hasNewDlt : typeof A.SetZDelta         === 'function' && typeof A.ApplyZDelta === 'function',
+          hasOldDlt : typeof A.ApplyZDelta       === 'function' && A.ApplyZDelta.length >= 1
+        };
+      };
+      const ready = () => {
+        const caps = probe();
+        return caps && (caps.hasSelect || caps.hasGround || caps.hasNewDlt || caps.hasOldDlt);
+      };
+      const fire = () => {
+        if (fired) return;
+        fired = true;
+        try {
+          const caps = probe();
+          AddLog(`[UI] ACAPI ready: select=${!!caps.hasSelect} ground=${!!caps.hasGround} newΔ=${!!caps.hasNewDlt} oldΔ=${!!caps.hasOldDlt}`);
+          cb();
+        } catch (e) { AddLog('[UI] callback error: ' + e); }
+      };
+
+      if (ready()) { fire(); return; }
+
+      let tries = 0;
+      const maxTries = 120;
+      const iv = setInterval(() => {
+        if (ready()) {
+          clearInterval(iv);
+          fire();
+        } else if (++tries > maxTries) {
+          clearInterval(iv);
+          AddLog('[UI] ACAPI never appeared (check palette/plugin loading)');
+        }
+      }, 50);
+    }
+
+    // =============== selection table ===============
+    function UpdateSelectedElements() {
+      const A = window.ACAPI;
+      if (!A || typeof A.GetSelectedElements !== 'function') {
+        // AddLog('[UI] ACAPI.GetSelectedElements unavailable');
+        return;
+      }
+      A.GetSelectedElements().then(function (elemInfos) {
+        const selectionTable = document.getElementById('selection');
+        
+        // Оптимизация: используем innerHTML вместо множества appendChild
+        let html = '';
+
+        if (!elemInfos || elemInfos.length === 0) {
+          html = '<tr><td colspan="4">No hay elementos seleccionados</td></tr>';
+        } else {
+          const grouped = {};
+          for (let i = 0; i < elemInfos.length; i++) {
+            const typeName  = elemInfos[i][1];
+            const elemID    = elemInfos[i][2];
+            const layerName = elemInfos[i][3] || 'Unknown';
+            
+            const key = typeName + "||" + elemID + "||" + layerName;
+            if (!grouped[key]) grouped[key] = { type: typeName, id: elemID, layer: layerName, count: 0 };
+            grouped[key].count++;
+          }
+          
+          // Оптимизация: формируем весь HTML за раз
+          for (const key of Object.keys(grouped)) {
+            html += '<tr>' +
+              '<td>' + grouped[key].type  + '</td>' +
+              '<td>' + grouped[key].id    + '</td>' +
+              '<td>' + grouped[key].layer + '</td>' +
+              '<td>' + grouped[key].count + '</td>' +
+              '</tr>';
+          }
+        }
+        
+        // Одна операция DOM вместо множества
+        selectionTable.innerHTML = html;
+      }).catch(err => console.log('[UI] GetSelectedElements error: ' + err));
+    }
+
+    // =============== ID renaming (bulk, without layers) ===============
+    function changeAllSelectedIDs() {
+      const A = window.ACAPI;
+      if (!A || typeof A.ChangeSelectedElementsID !== 'function') {
+        AddLog('[UI] ACAPI.ChangeSelectedElementsID unavailable');
+        return;
+      }
+      
+      const baseID = document.getElementById('baseID').value.trim();
+      if (!baseID) {
+        AddLog('[UI] Enter base name for element IDs');
+        document.getElementById('baseID').focus();
+        return;
+      }
+      
+      AddLog('[UI] Changing element IDs with base name: ' + baseID);
+      
+      A.ChangeSelectedElementsID(baseID).then(function(success) {
+        if (success) {
+          AddLog('[UI] ✅ All selected element IDs successfully changed!');
+          setInfo("id-change-info", "✅ ¡ID cambiados! Ejemplos: " + baseID + "-01, " + baseID + "-02, " + baseID + "-03...");
+          document.getElementById('baseID').value = '';
+          setTimeout(UpdateSelectedElements, 1000);
+        } else {
+          AddLog('[UI] ❌ Error changing element IDs');
+          setInfo("id-change-info", "❌ ¡Error! Posiblemente no hay elementos seleccionados o el elemento no admite cambio de ID");
+        }
+      }).catch(function(err) {
+        AddLog('[UI] ❌ Error calling ChangeSelectedElementsID: ' + err);
+        setInfo("id-change-info", "❌ Error: " + err);
+      });
+    }
+
+    // Храним полный список для фильтрации
+    let allLayersData = [];
+    
+    // Удалить префикс "Слои/" или "Layers/" из пути
+    function removeRootFolderPrefix(path) {
+      if (!path || path === '') return '';
+      // Проверяем, начинается ли путь с "Слои/" или "Layers/"
+      if (path.startsWith('Слои/')) {
+        return path.substring('Слои/'.length);
+      }
+      if (path.startsWith('Layers/')) {
+        return path.substring('Layers/'.length);
+      }
+      // Проверяем без слэша в конце
+      if (path === 'Слои' || path === 'Layers') {
+        return '';
+      }
+      return path;
+    }
+    
+    // =============== folder/layer list loading ===============
+    function loadExistingLayersList(filterText = '') {
+      const A = window.ACAPI;
+      const listEl = document.getElementById('existingLayersList');
+      if (!listEl) return;
+
+      listEl.innerHTML = '<option value="">Cargando...</option>';
+
+      if (!A) {
+        listEl.innerHTML = '<option value="">ACAPI no disponible</option>';
+        return;
+      }
+
+      // Si la función para obtener la lista de capas existe, la llamamos
+      if (typeof A.GetLayersList === 'function') {
+        A.GetLayersList().then(function(layersData) {
+          if (!layersData || layersData.length === 0) {
+            listEl.innerHTML = '<option value="">No se encontraron capas</option>';
+            allLayersData = [];
+            return;
+          }
+
+          // Guardamos la lista completa para filtrar
+          allLayersData = [];
+          
+          // Convertimos array de arrays en array de objetos
+          for (let i = 0; i < layersData.length; i++) {
+            const item = layersData[i];
+            if (Array.isArray(item) && item.length >= 2) {
+              allLayersData.push({
+                name: item[0] || '',
+                folder: item[1] || ''
+              });
+            }
+          }
+
+          // Aplicamos el filtro
+          filterLayersList(filterText);
+        }).catch(function(err) {
+          AddLog('[UI] Error al cargar lista de capas: ' + err);
+          listEl.innerHTML = '<option value="">Error al cargar capas</option>';
+          allLayersData = [];
+        });
+      } else {
+        // La función aún no está implementada, dejamos un placeholder
+        listEl.innerHTML = '<option value="">Función GetLayersList aún no disponible</option>';
+        AddLog('[UI] Función GetLayersList no disponible');
+        allLayersData = [];
+      }
+    }
+
+    function filterLayersList(filterText = '') {
+      const listEl = document.getElementById('existingLayersList');
+      if (!listEl) return;
+
+      listEl.innerHTML = '';
+      
+      if (allLayersData.length === 0) {
+        listEl.innerHTML = '<option value="">No se encontraron capas</option>';
+        return;
+      }
+
+      // Normalizamos el texto del filtro
+      const filter = filterText.trim().toLowerCase();
+      
+      // Agrupamos por carpetas
+      const folders = {};
+      const rootLayers = [];
+      const folderSet = new Set(); // Para rastrear carpetas únicas
+
+      for (let i = 0; i < allLayersData.length; i++) {
+        const item = allLayersData[i];
+        const folderPath = item.folder || '';
+        const layerName = item.name || '';
+        
+        // Verificamos si coincide con el filtro
+        const matchesFilter = !filter || 
+          folderPath.toLowerCase().startsWith(filter) || 
+          layerName.toLowerCase().startsWith(filter);
+        
+        if (!matchesFilter) continue;
+        
+        // Agregamos carpetas al conjunto
+        if (folderPath) {
+          const pathParts = folderPath.split('/').filter(p => p);
+          let currentPath = '';
+          for (let j = 0; j < pathParts.length; j++) {
+            currentPath = currentPath ? currentPath + '/' + pathParts[j] : pathParts[j];
+            if (!filter || currentPath.toLowerCase().startsWith(filter)) {
+              folderSet.add(currentPath);
+            }
+          }
+        }
+        
+        if (!folderPath || folderPath === '') {
+          rootLayers.push({ name: layerName, fullPath: layerName, isFolder: false });
+        } else {
+          const pathParts = folderPath.split('/').filter(p => p);
+          let current = folders;
+          
+          // Creamos estructura de carpetas
+          for (let j = 0; j < pathParts.length; j++) {
+            const part = pathParts[j];
+            if (!current[part]) {
+              current[part] = { _layers: [], _subfolders: {} };
+            }
+            if (j === pathParts.length - 1) {
+              // Última carpeta - agregamos capa
+              const fullPath = folderPath + '/' + layerName;
+              current[part]._layers.push({ name: layerName, fullPath: fullPath, folderPath: folderPath });
+            } else {
+              // Carpeta intermedia - vamos más profundo
+              current = current[part]._subfolders;
+            }
+          }
+        }
+      }
+
+      // Agregamos capas raíz
+      rootLayers.sort((a, b) => a.name.localeCompare(b.name));
+      for (let i = 0; i < rootLayers.length; i++) {
+        const opt = document.createElement('option');
+        opt.value = rootLayers[i].fullPath;
+        opt.textContent = '📄 ' + rootLayers[i].name;
+        opt.dataset.type = 'layer';
+        opt.dataset.folder = '';
+        opt.dataset.layer = rootLayers[i].name;
+        listEl.appendChild(opt);
+      }
+
+      // Agregamos carpetas y capas en ellas
+      function addFoldersToSelect(foldersObj, prefix = '') {
+        const folderNames = Object.keys(foldersObj).sort();
+        for (let i = 0; i < folderNames.length; i++) {
+          const folderName = folderNames[i];
+          if (folderName.startsWith('_')) continue;
+
+          const folder = foldersObj[folderName];
+          const currentPath = prefix ? prefix + '/' + folderName : folderName;
+
+          // Verificamos si la carpeta debe mostrarse (si hay filtro)
+          if (filter && !currentPath.toLowerCase().startsWith(filter) && 
+              (!folder._layers || folder._layers.length === 0)) {
+            // Saltamos la carpeta si no coincide con el filtro y no contiene capas
+            if (folder._subfolders && Object.keys(folder._subfolders).length > 0) {
+              // Pero continuamos recursivamente si hay subcarpetas
+              addFoldersToSelect(folder._subfolders, currentPath);
+            }
+            continue;
+          }
+
+          // Agregamos la carpeta
+          const folderOpt = document.createElement('option');
+          folderOpt.value = currentPath;
+          folderOpt.textContent = '📁 ' + currentPath;
+          folderOpt.style.fontWeight = 'bold';
+          folderOpt.dataset.type = 'folder';
+          folderOpt.dataset.folder = currentPath;
+          listEl.appendChild(folderOpt);
+
+          // Agregamos capas en la carpeta
+          if (folder._layers && folder._layers.length > 0) {
+            folder._layers.sort((a, b) => a.name.localeCompare(b.name));
+            for (let j = 0; j < folder._layers.length; j++) {
+              const layer = folder._layers[j];
+              const layerOpt = document.createElement('option');
+              layerOpt.value = layer.fullPath;
+              layerOpt.textContent = '  └─ 📄 ' + layer.name;
+              layerOpt.dataset.type = 'layer';
+              layerOpt.dataset.folder = layer.folderPath;
+              layerOpt.dataset.layer = layer.name;
+              listEl.appendChild(layerOpt);
+            }
+          }
+
+          // Recursivamente agregamos subcarpetas
+          if (folder._subfolders && Object.keys(folder._subfolders).length > 0) {
+            addFoldersToSelect(folder._subfolders, currentPath);
+          }
+        }
+      }
+
+      addFoldersToSelect(folders);
+
+      if (listEl.options.length === 0) {
+        listEl.innerHTML = '<option value="">No se encontraron capas coincidentes</option>';
+      }
+    }
+
+    function selectFromList() {
+      const listEl = document.getElementById('existingLayersList');
+      if (!listEl || listEl.selectedIndex < 0) return;
+
+      const selectedOption = listEl.options[listEl.selectedIndex];
+      if (!selectedOption || !selectedOption.value) return;
+
+      const optionType = selectedOption.dataset.type || '';
+      
+      if (optionType === 'folder') {
+        // Es una carpeta
+        const folderPath = selectedOption.dataset.folder || selectedOption.value;
+        // Eliminamos el prefijo "Слои/" o "Layers/" del camino
+        const cleanFolderPath = removeRootFolderPrefix(folderPath);
+        document.getElementById('layerFolder').value = cleanFolderPath;
+        document.getElementById('layerName').value = '';
+        AddLog('[UI] Carpeta seleccionada: ' + cleanFolderPath);
+      } else if (optionType === 'layer') {
+        // Es una capa
+        const folderPath = selectedOption.dataset.folder || '';
+        const layerName = selectedOption.dataset.layer || '';
+        
+        // Eliminamos el prefijo "Слои/" o "Layers/" del camino
+        const cleanFolderPath = removeRootFolderPrefix(folderPath);
+        document.getElementById('layerFolder').value = cleanFolderPath;
+        document.getElementById('layerName').value = layerName;
+        AddLog('[UI] Capa seleccionada: ' + (cleanFolderPath ? cleanFolderPath + ' / ' : '') + layerName);
+      }
+    }
+
+    // =============== folder/layer creation + move ===============
+    function createLayerAndMoveElements() {
+      const A = window.ACAPI;
+      if (!A) {
+        AddLog('[UI] ACAPI unavailable');
+        return;
+      }
+
+      let folderPath = document.getElementById('layerFolder').value.trim();
+      const layerName  = document.getElementById('layerName').value.trim();
+      const hideLayer = document.getElementById('hideLayer').checked;
+
+      // Eliminamos el prefijo "Слои/" o "Layers/" del camino antes de enviar
+      folderPath = removeRootFolderPrefix(folderPath);
+
+      if (!folderPath && !layerName) {
+        AddLog('[UI] Ingrese la ruta de la carpeta o el nombre de la capa');
+        document.getElementById('layerFolder').focus();
+        return;
+      }
+      if (!layerName) {
+        AddLog('[UI] Ingrese el nombre de la capa');
+        document.getElementById('layerName').focus();
+        return;
+      }
+
+      AddLog('[UI] Creando carpeta: ' + folderPath + ', capa: ' + layerName + ', ocultar: ' + hideLayer);
+      setInfo("info-layers", "Creando carpeta, capa y moviendo elementos seleccionados...");
+
+      if (typeof A.CreateLayerAndMoveElements === 'function') {
+        const params = folderPath + '|' + layerName + '|' + (hideLayer ? '1' : '0');
+
+        AddLog('[JS] CreateLayerAndMoveElements');
+        AddLog('[JS] Parameters: ' + params);
+        
+        A.CreateLayerAndMoveElements(params).then(function(success) {
+          AddLog('[JS] CreateLayerAndMoveElements returned: ' + success);
+          if (success) {
+            AddLog('[UI] ✅ ¡Carpeta/capa creada, elementos movidos!');
+            setInfo("info-layers", "✅ ¡Éxito! Carpeta: " + folderPath + ", Capa: " + layerName);
+            
+            // Limpiamos los campos de entrada
+            document.getElementById('layerFolder').value  = '';
+            document.getElementById('layerName').value    = '';
+            
+            // Actualizamos la lista de capas existentes después de un pequeño retraso (para que ArchiCAD actualice la estructura)
+            setTimeout(function() {
+              loadExistingLayersList(''); // Cargamos sin filtro para mostrar todas las capas y carpetas
+            }, 500);
+            
+            setTimeout(UpdateSelectedElements, 1000);
+          } else {
+            AddLog('[UI] ❌ Error al crear carpeta/capa o mover elementos');
+            setInfo("info-layers", "❌ ¡Error! Verifique los datos ingresados/selección.");
+          }
+        }).catch(function(err) {
+          AddLog('[UI] ❌ Error al llamar CreateLayerAndMoveElements: ' + err);
+          setInfo("info-layers", "❌ Error: " + err);
+        });
+      } else {
+        AddLog('[UI] ❌ Función CreateLayerAndMoveElements no disponible');
+        setInfo("info-layers", "❌ Función no disponible (actualice el complemento)");
+      }
+    }
+
+    // =============== orientation/distribution/... ===============
+    function SetDistributionLine()     { if (ACAPI?.SetDistributionLine)     ACAPI.SetDistributionLine();     setInfo("info-dist","Línea establecida"); }
+    function SetDistributionObject()   { if (ACAPI?.SetDistributionObject)   ACAPI.SetDistributionObject();   setInfo("info-dist","Objeto establecido"); }
+    function openDistributionPalette() {
+      if (ACAPI?.OpenDistributionPalette) {
+        AddLog('[UI] OpenDistributionPalette');
+        ACAPI.OpenDistributionPalette();
+      } else {
+        AddLog('[UI] OpenDistributionPalette unavailable');
+      }
+    }
+    function openOrientationPalette() {
+      if (ACAPI?.OpenOrientationPalette) {
+        AddLog('[UI] OpenOrientationPalette');
+        ACAPI.OpenOrientationPalette();
+      } else {
+        AddLog('[UI] OpenOrientationPalette unavailable');
+      }
+    }
+    function openGroundPalette() {
+      if (ACAPI?.OpenGroundPalette) {
+        AddLog('[UI] OpenGroundPalette');
+        ACAPI.OpenGroundPalette();
+      } else {
+        AddLog('[UI] OpenGroundPalette unavailable');
+      }
+    }
+    function openMarkupPalette() {
+      if (ACAPI?.OpenMarkupPalette) {
+        AddLog('[UI] OpenMarkupPalette');
+        ACAPI.OpenMarkupPalette();
+      } else {
+        AddLog('[UI] OpenMarkupPalette unavailable');
+      }
+    }
+    function openIdLayersPalette() {
+      if (ACAPI?.OpenIdLayersPalette) {
+        AddLog('[UI] OpenIdLayersPalette');
+        ACAPI.OpenIdLayersPalette();
+      } else {
+        AddLog('[UI] OpenIdLayersPalette unavailable');
+      }
+    }
+    function openAnglePalette() {
+      if (ACAPI?.OpenAnglePalette) {
+        AddLog('[UI] OpenAnglePalette');
+        ACAPI.OpenAnglePalette();
+      } else {
+        AddLog('[UI] OpenAnglePalette unavailable');
+      }
+    }
+    function openMeshPalette() {
+      if (ACAPI?.OpenMeshPalette) {
+        AddLog('[UI] OpenMeshPalette');
+        ACAPI.OpenMeshPalette();
+      } else {
+        AddLog('[UI] OpenMeshPalette unavailable');
+      }
+    }
+    function openContourPalette() {
+      if (ACAPI?.OpenContourPalette) {
+        AddLog('[UI] OpenContourPalette');
+        ACAPI.OpenContourPalette();
+      } else {
+        AddLog('[UI] OpenContourPalette unavailable');
+      }
+    }
+
+    // Orientation palette shortcuts
+    function SetBeamsForOrient() { openAnglePalette(); }
+    function SetMeshForBeams() { openAnglePalette(); }
+    function OrientBeamsToSurface() { openAnglePalette(); }
+    function RotateSelectedOrientation() { openAnglePalette(); }
+    function SetDistributionStep () {
+      const s = parseNumber(document.getElementById('distStep'), 0);
+      const step = (isFinite(s) && s > 0) ? s : 0;
+      if (ACAPI?.SetDistributionStep) ACAPI.SetDistributionStep(step);
+      if (step > 0 && ACAPI?.DistributeNow) {
+        const payload = "step:" + step;
+        AddLog("[UI] Step OK → " + payload);
+        ACAPI.DistributeNow(payload).then(ok => setInfo("info-dist", ok ? "Distribuido por paso" : "Error de distribución"));
+      } else if (step <= 0) setInfo("info-dist", "El paso debe ser > 0");
+    }
+    function SetDistributionCount () {
+      const c = parseInt((document.getElementById('distCount').value || "0"), 10);
+      const count = (isFinite(c) && c > 0) ? c : 0;
+      if (ACAPI?.SetDistributionCount) ACAPI.SetDistributionCount(count);
+      if (count > 0 && ACAPI?.DistributeNow) {
+        const payload = "count:" + count;
+        AddLog("[UI] Count OK → " + payload);
+        ACAPI.DistributeNow(payload).then(ok => setInfo("info-dist", ok ? "Distribuido por cantidad" : "Error de distribución"));
+      } else if (count <= 0) setInfo("info-dist", "La cantidad debe ser ≥ 1");
+    }
+
+    // ================= SHELL / CONTOURS =================
+    async function SetMeshForContours() { openContourPalette(); }
+
+    function SelectBaseLine() { openContourPalette(); }
+
+    function CreateShellFromLine() { openContourPalette(); }
+
+    // ================= MARKUP/DIMENSIONS =================
+    async function SetMarkupStepUI() { openMarkupPalette(); }
+    async function CreateMarkupUI() { openMarkupPalette(); }
+    async function CreateDimensionsToLineUI() { openMarkupPalette(); }
+    async function CreateDimensionsBetweenUI() { openMarkupPalette(); }
+    async function CreateDimensionsToPointUI() { openMarkupPalette(); }
+
+    // ================= GROUNDING / OFFSET =================
+    async function SetGroundSurfaceUI() { openGroundPalette(); }
+
+    async function SetGroundObjectsUI() { openGroundPalette(); }
+
+    async function ApplyZDeltaUI() { openGroundPalette(); }
+
+    async function LandToMeshUI() { openGroundPalette(); }
+
+    // ================= MESH CREATION =================
+    async function CreateMeshUI() { openContourPalette(); }
+
+    // ================= MESH FROM LINE =================
+    function SelectBaseLineMesh() { openMeshPalette(); }
+
+    async function SetMeshForMesh() { openMeshPalette(); }
+
+    async function CreateMeshFromLineUI() { openMeshPalette(); }
+
+    function onShift(mm) {
+      const m = parseFloat(mm) / 1000;
+      AddLog(`[UI] Shift click, delta=${m} m`);
+      if (window.ACAPI_Call) ACAPI_Call('ApplyZDelta', m);
+    }
+    function onLand() {
+      AddLog(`[UI] Land click`);
+      if (window.ACAPI_Call) ACAPI_Call('ApplyGroundOffset', 0.0);
+    }
+
+    // =============== tabs / init ===============
+    function openTab(evt, tabId) {
+      const contents = document.getElementsByClassName("tabcontent");
+      const links = document.getElementsByClassName("tablink");
+      for (let i = 0; i < contents.length; i++) contents[i].style.display = "none";
+      for (let i = 0; i < links.length; i++) links[i].classList.remove("active");
+      const tab = document.getElementById(tabId);
+      if (tab) tab.style.display = "block";
+      evt.currentTarget.classList.add("active");
+      AddLog('[UI] Tab → ' + tabId);
+      
+      // Cargamos la lista de capas al abrir la pestaña Layers
+      if (tabId === 'tab-layers') {
+        whenACAPIReadyDo(function() {
+          loadExistingLayersList();
+        });
+      }
+    }
+    window.openTab = openTab;
+
+    window.addEventListener('DOMContentLoaded', function () {
+      AddLog("[UI] Ready (UI v0.4)");
+
+      // Enter handlers
+      document.getElementById('distStep')    ?.addEventListener('keydown', e => { if (e.key === 'Enter') SetDistributionStep(); });
+      document.getElementById('distCount')   ?.addEventListener('keydown', e => { if (e.key === 'Enter') SetDistributionCount(); });
+      
+      // ID + Layers tab
+      document.getElementById('baseID')      ?.addEventListener('keydown', e => { if (e.key === 'Enter') changeAllSelectedIDs(); });
+      document.getElementById('layerFolder') ?.addEventListener('keydown', e => { if (e.key === 'Enter') createLayerAndMoveElements(); });
+      document.getElementById('layerName')   ?.addEventListener('keydown', e => { if (e.key === 'Enter') createLayerAndMoveElements(); });
+      
+      // Filtrado de lista de capas al escribir en el campo Layer Folder
+      document.getElementById('layerFolder')?.addEventListener('input', function(e) {
+        const filterText = e.target.value.trim();
+        if (allLayersData.length > 0) {
+          filterLayersList(filterText);
+        }
+      });
+      
+      // Markup
+      document.getElementById('markupStep')  ?.addEventListener('keydown', e => { if (e.key === 'Enter') whenACAPIReadyDo(SetMarkupStepUI); });
+
+      // help buttons
+      document.addEventListener('click', function (e) {
+        const el = e.target.closest('[data-help-url]');
+        if (!el) return;
+        e.preventDefault();
+        let url = el.getAttribute('data-help-url') || 'https://landscape.227.info/help/start';
+        const separator = url.includes('?') ? '&' : '?';
+        const timestamp = Date.now();
+        url = url + separator + 'v=' + timestamp;
+        AddLog('[UI] help → ' + url);
+
+        const A = window.ACAPI;
+        if (A && typeof A.OpenHelp === 'function') {
+          Promise
+            .resolve(A.OpenHelp(url))
+            .then(() => AddLog('[UI] ACAPI.OpenHelp ok'))
+            .catch(err => AddLog('[UI] ACAPI.OpenHelp error: ' + err));
+        } else {
+          AddLog('[UI] ACAPI.OpenHelp not found → window.open');
+          window.open(url, '_blank', 'noopener,noreferrer');
+        }
+      });
+
+      // wait for bridge, then fill selection table
+      whenACAPIReadyDo(() => {
+        UpdateSelectedElements();
+      });
+
+      // default tab: Distribution
+      const defaultTab = document.querySelector('.tablink');
+      if (defaultTab) defaultTab.click();
+    });
+  </script>
+</head>
+
+<body>
+  <!-- LANDSCAPE HELPER Logo -->
+  <div class="logo-container">
+    <div class="logo-icon">
+      <div class="mountain"></div>
+    </div>
+    <div class="logo-text">
+      <div class="logo-title">LANDSCAPE HELPER</div>
+      <div class="logo-subtitle">COMPLEMENTO DE AUTOMATIZACIÓN DE PAISAJE</div>
+    </div>
+  </div>
+
+  <!-- Selection Table -->
+  <table class="selection-table">
+    <thead>
+      <tr><th colspan="4">Elementos seleccionados:</th></tr>
+      <tr><th>Tipo</th><th>ID</th><th>Capa</th><th>Cantidad</th></tr>
+    </thead>
+    <tbody id="selection"><tr><td colspan="4">No hay elementos seleccionados</td></tr></tbody>
+  </table>
+
+  <div class="palette-launchers">
+    <button class="palette-button" onclick="openDistributionPalette()">Distribución</button>
+    <button class="palette-button" onclick="openOrientationPalette()">Orientación</button>
+    <button class="palette-button" onclick="openAnglePalette()">Ángulo</button>
+    <button class="palette-button" onclick="openGroundPalette()">Anclaje</button>
+    <button class="palette-button" onclick="openMarkupPalette()">Marcado</button>
+    <button class="palette-button" onclick="openIdLayersPalette()">ID / Capas</button>
+    <button class="palette-button" onclick="openContourPalette()">Contornos</button>
+    <button class="palette-button" onclick="openMeshPalette()">Malla</button>
+  </div>
+
+  
+  <!-- Distribution -->
+
+
+  <!-- Angle -->
+  <div id="tab-columns" class="tabcontent"></div>
+
+
+  <!-- Black log strip -->
+  <div id="log-box">[Aquí aparecerá el registro del complemento]</div>
+
+  <a href="#"
+     data-help-url="https://landscape.227.info/?embed=1"
+     data-help-title="LandscapeHelper — sitio web">
+    landscape.227.info
+  </a>
+</body>
+</html>
