@@ -270,8 +270,10 @@
         <div class="buttons">
             <button class="btn btn-primary" onclick="calculate()" id="calcBtn">Рассчитать</button>
             <button class="btn btn-success" onclick="writeResults()" id="writeBtn" disabled>Записать в объекты</button>
+            <button class="btn btn-secondary" onclick="openSettings()" style="background: #6c757d;">⚙️ Настроить</button>
             <button class="btn btn-secondary" onclick="exportCSV()" id="exportBtn" disabled>Экспорт CSV</button>
             <button class="btn btn-secondary" onclick="importCSV()" id="importBtn">Импорт CSV</button>
+            
         </div>
     </div>
 
@@ -855,7 +857,47 @@
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
             // Все элементы видны по умолчанию
+            loadSavedSettings();
         });
+
+        // Открыть палитру настроек
+        async function openSettings() {
+            try {
+                if (window.ACAPI && window.ACAPI.OpenSettingsPalette) {
+                    await window.ACAPI.OpenSettingsPalette();
+                } else {
+                    alert('Функция настроек недоступна');
+                }
+            } catch (e) {
+                console.error('Ошибка открытия настроек:', e);
+                alert('Ошибка открытия настроек: ' + e.message);
+            }
+        }
+
+        // Загрузка сохраненных настроек при инициализации
+        async function loadSavedSettings() {
+            try {
+                if (window.ACAPI && window.ACAPI.GetCassetteSettings) {
+                    const settings = await window.ACAPI.GetCassetteSettings();
+                    
+                    document.getElementById('plankWidth0').value = settings.type0.plankWidth;
+                    document.getElementById('slopeWidth0').value = settings.type0.slopeWidth;
+                    document.getElementById('plankWidth12').value = settings.type1_2.plankWidth;
+                    document.getElementById('slopeWidth12').value = settings.type1_2.slopeWidth;
+                    document.getElementById('offsetX').value = settings.type0.offsetX;
+                    document.getElementById('offsetY').value = settings.type0.offsetY;
+                    document.getElementById('offsetTop').value = settings.type1_2.x2Coeff;
+                    
+                    console.log('Настройки загружены из файла');
+                } else {
+                    console.log('ACAPI недоступен, используются значения по умолчанию');
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки настроек:', e);
+            }
+        }
+        
+        
     </script>
 </body>
 </html>
