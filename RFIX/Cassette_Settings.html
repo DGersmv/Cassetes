@@ -270,6 +270,11 @@
     <div id="status"></div>
 
     <script>
+        // Helper function to check API availability
+        function isApiAvailable() {
+            return window.ACAPI && typeof window.ACAPI === 'object';
+        }
+
         // Переключение табов
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
@@ -380,7 +385,7 @@
         async function saveSettings() {
             const settings = collectSettings();
             try {
-                if (window.ACAPI && window.ACAPI.SaveCassetteSettings) {
+                if (isApiAvailable() && window.ACAPI.SaveCassetteSettings) {
                     const result = await window.ACAPI.SaveCassetteSettings(settings);
                     if (result.success) {
                         showStatus('Настройки сохранены');
@@ -398,7 +403,7 @@
         // Загрузить настройки
         async function loadSettings() {
             try {
-                if (window.ACAPI && window.ACAPI.GetCassetteSettings) {
+                if (isApiAvailable() && window.ACAPI.GetCassetteSettings) {
                     const settings = await window.ACAPI.GetCassetteSettings();
                     applySettings(settings);
                     showStatus('Настройки загружены');
@@ -416,7 +421,7 @@
         // Сбросить к defaults
         async function resetDefaults() {
             try {
-                if (window.ACAPI && window.ACAPI.ResetCassetteSettings) {
+                if (isApiAvailable() && window.ACAPI.ResetCassetteSettings) {
                     const result = await window.ACAPI.ResetCassetteSettings();
                     if (result.success) {
                         // Перезагружаем настройки из сохраненных defaults
