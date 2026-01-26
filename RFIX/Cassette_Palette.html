@@ -270,6 +270,7 @@
         <div class="buttons">
             <button class="btn btn-primary" onclick="calculate()" id="calcBtn">Рассчитать</button>
             <button class="btn btn-success" onclick="writeResults()" id="writeBtn" disabled>Записать в объекты</button>
+            <button class="btn btn-secondary" onclick="openSettings()" style="background: #6c757d;">⚙️ Настроить</button>
             <button class="btn btn-secondary" onclick="exportCSV()" id="exportBtn" disabled>Экспорт CSV</button>
             <button class="btn btn-secondary" onclick="importCSV()" id="importBtn">Импорт CSV</button>
             <button class="btn btn-secondary" onclick="openSettings()" style="background: #6c757d;">⚙️ Настроить</button>
@@ -895,6 +896,59 @@
                 console.error('Ошибка загрузки настроек:', e);
             }
         }
+        
+        // Открыть палитру настроек
+        async function openSettings() {
+            try {
+                if (window.ACAPI && window.ACAPI.OpenSettingsPalette) {
+                    await window.ACAPI.OpenSettingsPalette();
+                } else {
+                    alert('Функция настроек недоступна');
+                }
+            } catch (e) {
+                console.error('Ошибка открытия настроек:', e);
+                alert('Ошибка: ' + e.message);
+            }
+        }
+
+        // Загрузка сохраненных настроек
+        async function loadSavedSettings() {
+            try {
+                if (!window.ACAPI || !window.ACAPI.GetCassetteSettings) return;
+                
+                const settings = await window.ACAPI.GetCassetteSettings();
+                
+                if (settings.type0) {
+                    const plankWidth0 = document.getElementById('plankWidth0');
+                    const slopeWidth0 = document.getElementById('slopeWidth0');
+                    const offsetX = document.getElementById('offsetX');
+                    const offsetY = document.getElementById('offsetY');
+                    
+                    if (plankWidth0) plankWidth0.value = settings.type0.plankWidth || 285;
+                    if (slopeWidth0) slopeWidth0.value = settings.type0.slopeWidth || 285;
+                    if (offsetX) offsetX.value = settings.type0.offsetX || 165;
+                    if (offsetY) offsetY.value = settings.type0.offsetY || 50;
+                }
+                
+                if (settings.type1_2) {
+                    const plankWidth12 = document.getElementById('plankWidth12');
+                    const slopeWidth12 = document.getElementById('slopeWidth12');
+                    const offsetTop = document.getElementById('offsetTop');
+                    
+                    if (plankWidth12) plankWidth12.value = settings.type1_2.plankWidth || 160;
+                    if (slopeWidth12) slopeWidth12.value = settings.type1_2.slopeWidth || 225;
+                    if (offsetTop) offsetTop.value = settings.type1_2.x2Coeff || 745;
+                }
+                
+                console.log('Настройки загружены');
+            } catch (e) {
+                console.error('Ошибка загрузки настроек:', e);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSavedSettings();
+        });
     </script>
 </body>
 </html>
