@@ -7,6 +7,7 @@
 #include "DGBrowser.hpp"
 #include "CassetteHelper.hpp"
 #include "CassetteSettings.hpp"
+#include "CassetteSettingsPalette.hpp"
 
 #include <cmath>
 #include <cstdio>
@@ -490,6 +491,108 @@ void BrowserRepl::RegisterACAPIJavaScriptObject(DG::Browser& browser)
         
         result->AddItem("success", new JS::Value(success));
         result->AddItem("errorMessage", new JS::Value(errorMessage));
+        
+        return result;
+    }));
+
+    // ------------------------------------------------------------
+    // SaveCassetteSettings - сохранить настройки
+    // ------------------------------------------------------------
+    
+    jsACAPI->AddItem(new JS::Function("SaveCassetteSettings", [](GS::Ref<JS::Base> param) -> GS::Ref<JS::Base> {
+        GS::Ref<JS::Object> result = new JS::Object();
+        
+        if (GS::Ref<JS::Object> jsParam = GS::DynamicCast<JS::Object>(param)) {
+            const GS::HashTable<GS::UniString, GS::Ref<JS::Base>>& itemTable = jsParam->GetItemTable();
+            
+            CassetteSettings::Settings settings;
+            
+            // Парсим общие настройки
+            GS::Ref<JS::Base> item;
+            if (itemTable.Get("defaultType", &item)) 
+                settings.defaultType = GetIntFromJs(item);
+            if (itemTable.Get("wallIdForFloorHeight", &item)) 
+                settings.wallIdForFloorHeight = GetStringFromJs(item);
+            if (itemTable.Get("showDuplicateWarning", &item)) 
+                settings.showDuplicateWarning = GetBoolFromJs(item);
+            
+            // Парсим type0
+            GS::Ref<JS::Base> type0Base;
+            if (itemTable.Get("type0", &type0Base)) {
+                if (GS::Ref<JS::Object> jsType0 = GS::DynamicCast<JS::Object>(type0Base)) {
+                    const GS::HashTable<GS::UniString, GS::Ref<JS::Base>>& type0Table = jsType0->GetItemTable();
+                    if (type0Table.Get("plankWidth", &item)) settings.type0.plankWidth = GetIntFromJs(item);
+                    if (type0Table.Get("slopeWidth", &item)) settings.type0.slopeWidth = GetIntFromJs(item);
+                    if (type0Table.Get("offsetX", &item)) settings.type0.offsetX = GetIntFromJs(item);
+                    if (type0Table.Get("offsetY", &item)) settings.type0.offsetY = GetIntFromJs(item);
+                    if (type0Table.Get("cassetteId", &item)) settings.type0.cassetteId = GetStringFromJs(item);
+                    if (type0Table.Get("plankId", &item)) settings.type0.plankId = GetStringFromJs(item);
+                    if (type0Table.Get("leftSlopeId", &item)) settings.type0.leftSlopeId = GetStringFromJs(item);
+                    if (type0Table.Get("rightSlopeId", &item)) settings.type0.rightSlopeId = GetStringFromJs(item);
+                }
+            }
+            
+            // Парсим type1_2
+            GS::Ref<JS::Base> type12Base;
+            if (itemTable.Get("type1_2", &type12Base)) {
+                if (GS::Ref<JS::Object> jsType12 = GS::DynamicCast<JS::Object>(type12Base)) {
+                    const GS::HashTable<GS::UniString, GS::Ref<JS::Base>>& type12Table = jsType12->GetItemTable();
+                    if (type12Table.Get("plankWidth", &item)) settings.type1_2.plankWidth = GetIntFromJs(item);
+                    if (type12Table.Get("slopeWidth", &item)) settings.type1_2.slopeWidth = GetIntFromJs(item);
+                    if (type12Table.Get("offsetX", &item)) settings.type1_2.offsetX = GetIntFromJs(item);
+                    if (type12Table.Get("offsetY", &item)) settings.type1_2.offsetY = GetIntFromJs(item);
+                    if (type12Table.Get("x2Coeff", &item)) settings.type1_2.x2Coeff = GetIntFromJs(item);
+                    if (type12Table.Get("cassetteId", &item)) settings.type1_2.cassetteId = GetStringFromJs(item);
+                    if (type12Table.Get("plankId", &item)) settings.type1_2.plankId = GetStringFromJs(item);
+                    if (type12Table.Get("leftSlopeId", &item)) settings.type1_2.leftSlopeId = GetStringFromJs(item);
+                    if (type12Table.Get("rightSlopeId", &item)) settings.type1_2.rightSlopeId = GetStringFromJs(item);
+                }
+            }
+            
+            // Сохраняем настройки
+            bool success = CassetteSettings::SaveSettings(settings);
+            result->AddItem("success", new JS::Value(success));
+            if (!success) {
+                result->AddItem("errorMessage", new JS::Value("Не удалось сохранить настройки"));
+            }
+        } else {
+            result->AddItem("success", new JS::Value(false));
+            result->AddItem("errorMessage", new JS::Value("Неверные параметры"));
+        }
+        
+        return result;
+    }));
+
+    // ------------------------------------------------------------
+    // ResetCassetteSettings - сбросить настройки к умолчаниям
+    // ------------------------------------------------------------
+    
+    jsACAPI->AddItem(new JS::Function("ResetCassetteSettings", [](GS::Ref<JS::Base>) -> GS::Ref<JS::Base> {
+        GS::Ref<JS::Object> result = new JS::Object();
+        
+        bool success = CassetteSettings::ResetToDefaults();
+        result->AddItem("success", new JS::Value(success));
+        if (!success) {
+            result->AddItem("errorMessage", new JS::Value("Не удалось сбросить настройки"));
+        }
+        
+        return result;
+    }));
+
+    // ------------------------------------------------------------
+    // CloseSettingsPalette - закрыть палитру настроек
+    // ------------------------------------------------------------
+    
+    jsACAPI->AddItem(new JS::Function("CloseSettingsPalette", [](GS::Ref<JS::Base>) -> GS::Ref<JS::Base> {
+        GS::Ref<JS::Object> result = new JS::Object();
+        
+        if (CassetteSettingsPalette::HasInstance()) {
+            CassetteSettingsPalette::GetInstance().Hide();
+            result->AddItem("success", new JS::Value(true));
+        } else {
+            result->AddItem("success", new JS::Value(false));
+            result->AddItem("errorMessage", new JS::Value("Палитра не открыта"));
+        }
         
         return result;
     }));

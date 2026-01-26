@@ -380,12 +380,16 @@
         async function saveSettings() {
             const settings = collectSettings();
             try {
-                // TODO: Вызвать SaveCassetteSettings через ACAPI
-                // await window.ACAPI.SaveCassetteSettings(settings);
-                
-                // Пока сохраняем в localStorage
-                localStorage.setItem('cassetteSettings', JSON.stringify(settings));
-                showStatus('Настройки сохранены');
+                if (window.ACAPI && window.ACAPI.SaveCassetteSettings) {
+                    const result = await window.ACAPI.SaveCassetteSettings(settings);
+                    if (result.success) {
+                        showStatus('Настройки сохранены');
+                    } else {
+                        showStatus('Ошибка: ' + (result.errorMessage || 'Неизвестная ошибка'), true);
+                    }
+                } else {
+                    showStatus('API недоступно', true);
+                }
             } catch (e) {
                 showStatus('Ошибка сохранения: ' + e, true);
             }
@@ -394,23 +398,42 @@
         // Загрузить настройки
         async function loadSettings() {
             try {
-                // TODO: Вызвать GetCassetteSettings через ACAPI
-                // const settings = await window.ACAPI.GetCassetteSettings();
-                
-                // Пока из localStorage
-                const stored = localStorage.getItem('cassetteSettings');
-                const settings = stored ? JSON.parse(stored) : getDefaultSettings();
-                applySettings(settings);
-                showStatus('Настройки загружены');
+                if (window.ACAPI && window.ACAPI.GetCassetteSettings) {
+                    const settings = await window.ACAPI.GetCassetteSettings();
+                    applySettings(settings);
+                    showStatus('Настройки загружены');
+                } else {
+                    // Fallback к defaults если API недоступно
+                    applySettings(getDefaultSettings());
+                    showStatus('Загружены настройки по умолчанию', true);
+                }
             } catch (e) {
                 showStatus('Ошибка загрузки: ' + e, true);
+                applySettings(getDefaultSettings());
             }
         }
 
         // Сбросить к defaults
-        function resetDefaults() {
-            applySettings(getDefaultSettings());
-            showStatus('Настройки сброшены');
+        async function resetDefaults() {
+            try {
+                if (window.ACAPI && window.ACAPI.ResetCassetteSettings) {
+                    const result = await window.ACAPI.ResetCassetteSettings();
+                    if (result.success) {
+                        // Перезагружаем настройки из сохраненных defaults
+                        await loadSettings();
+                        showStatus('Настройки сброшены к умолчаниям');
+                    } else {
+                        showStatus('Ошибка: ' + (result.errorMessage || 'Неизвестная ошибка'), true);
+                    }
+                } else {
+                    // Локальный fallback
+                    applySettings(getDefaultSettings());
+                    showStatus('Настройки сброшены (локально)');
+                }
+            } catch (e) {
+                showStatus('Ошибка сброса: ' + e, true);
+                applySettings(getDefaultSettings());
+            }
         }
 
         // Загружаем настройки при старте
