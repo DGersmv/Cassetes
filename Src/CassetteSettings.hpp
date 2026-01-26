@@ -45,6 +45,9 @@ bool LoadSettings(Settings& settings);
 // Сохранить настройки в файл
 bool SaveSettings(const Settings& settings);
 
+// Сбросить настройки к значениям по умолчанию
+bool ResetToDefaults();
+
 // Получить путь к файлу настроек
 GS::UniString GetSettingsFilePath();
 

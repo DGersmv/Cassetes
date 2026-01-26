@@ -13,6 +13,7 @@
 
 // Cassette Panel includes
 #include "CassettePalette.hpp"
+#include "CassetteSettingsPalette.hpp"
 
 // -----------------------------------------------------------------------------
 // MenuCommandHandler
@@ -26,6 +27,9 @@ GSErrCode MenuCommandHandler (const API_MenuParams *menuParams)
 			switch (menuParams->menuItemRef.itemIndex) {
 				case CassetteMenuCalcItem:  // "Расчёт кассет"
 					CassettePalette::ShowPalette();
+					break;
+				case CassetteMenuSettingsItem:  // "Настройки"
+					CassetteSettingsPalette::ShowPalette();
 					break;
 				default:
 					break;
@@ -87,6 +91,11 @@ GSErrCode Initialize ()
 	
 	if (DBERROR (palErr != NoError))
 		return palErr;
+
+	// 3) Регистрация палитры настроек
+	GSErrCode palErr2 = CassetteSettingsPalette::RegisterPaletteControlCallBack();
+	if (DBERROR (palErr2 != NoError))
+		return palErr2;
 
 	return NoError;
 }
