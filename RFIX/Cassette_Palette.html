@@ -525,36 +525,40 @@
         // Загрузить настройки из ACAPI
         async function loadSettings() {
             try {
-                if (!window.ACAPI?.GetCassetteSettings || typeof window.ACAPI.GetCassetteSettings !== 'function') {
-                    const msg = 'ACAPI недоступен - используются значения по умолчанию';
-                    console.warn(msg);
-                    showStatus(msg, true);
+                if (!window.ACAPI || !window.ACAPI.GetCassetteSettings) {
+                    const msg = 'Используются значения по умолчанию';
+                    console.warn('ACAPI недоступен:', msg);
                     return;
                 }
                 const settings = await window.ACAPI.GetCassetteSettings();
-                if (settings) {
-                    if (settings.type0) {
-                        document.getElementById('plankWidth0').value = settings.type0.plankWidth || 285;
-                        document.getElementById('slopeWidth0').value = settings.type0.slopeWidth || 285;
-                        document.getElementById('plankId0').value = settings.type0.plankId || 'OK-0_PLNK';
-                        document.getElementById('leftSlopeId0').value = settings.type0.leftSlopeId || 'OK-0_LOTK';
-                        document.getElementById('rightSlopeId0').value = settings.type0.rightSlopeId || 'OK-0_ROTK';
-                    }
-                    if (settings.type1_2) {
-                        document.getElementById('plankWidth12').value = settings.type1_2.plankWidth || 160;
-                        document.getElementById('slopeWidth12').value = settings.type1_2.slopeWidth || 225;
-                        document.getElementById('offsetX').value = settings.type1_2.offsetX || 165;
-                        document.getElementById('offsetY').value = settings.type1_2.offsetY || 50;
-                        document.getElementById('offsetTop').value = settings.type1_2.x2Coeff || 745;
-                        document.getElementById('cassetteId12').value = settings.type1_2.cassetteId || 'OK-1_2_CASS';
-                        document.getElementById('plankId12').value = settings.type1_2.plankId || 'OK-1_2_PLNK';
-                        document.getElementById('leftSlopeId12').value = settings.type1_2.leftSlopeId || 'OK-1_2_LOTK';
-                        document.getElementById('rightSlopeId12').value = settings.type1_2.rightSlopeId || 'OK-1_2_ROTK';
-                    }
-                    const msg = 'Настройки загружены';
-                    console.log(msg);
+                if (!settings) {
+                    const msg = 'Настройки не найдены - используются значения по умолчанию';
+                    console.warn(msg);
                     showStatus(msg, false);
+                    return;
                 }
+                
+                if (settings.type0) {
+                    document.getElementById('plankWidth0').value = settings.type0.plankWidth || 285;
+                    document.getElementById('slopeWidth0').value = settings.type0.slopeWidth || 285;
+                    document.getElementById('plankId0').value = settings.type0.plankId || 'OK-0_PLNK';
+                    document.getElementById('leftSlopeId0').value = settings.type0.leftSlopeId || 'OK-0_LOTK';
+                    document.getElementById('rightSlopeId0').value = settings.type0.rightSlopeId || 'OK-0_ROTK';
+                }
+                if (settings.type1_2) {
+                    document.getElementById('plankWidth12').value = settings.type1_2.plankWidth || 160;
+                    document.getElementById('slopeWidth12').value = settings.type1_2.slopeWidth || 225;
+                    document.getElementById('offsetX').value = settings.type1_2.offsetX || 165;
+                    document.getElementById('offsetY').value = settings.type1_2.offsetY || 50;
+                    document.getElementById('offsetTop').value = settings.type1_2.x2Coeff || 745;
+                    document.getElementById('cassetteId12').value = settings.type1_2.cassetteId || 'OK-1_2_CASS';
+                    document.getElementById('plankId12').value = settings.type1_2.plankId || 'OK-1_2_PLNK';
+                    document.getElementById('leftSlopeId12').value = settings.type1_2.leftSlopeId || 'OK-1_2_LOTK';
+                    document.getElementById('rightSlopeId12').value = settings.type1_2.rightSlopeId || 'OK-1_2_ROTK';
+                }
+                const msg = 'Настройки загружены';
+                console.log(msg);
+                showStatus(msg, false);
             } catch (e) {
                 const msg = 'Ошибка загрузки настроек: ' + e.message;
                 console.error(msg, e);
