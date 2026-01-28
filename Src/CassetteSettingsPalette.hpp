@@ -10,7 +10,8 @@
 #include "APIEnvir.h"
 #include "ACAPinc.h"
 
-class CassetteSettingsPalette : public DG::Palette,\n                                public DG::PanelObserver,
+class CassetteSettingsPalette : public DG::Palette,
+                                public DG::PanelObserver,
                                 public DG::CompoundItemObserver {
 public:
     CassetteSettingsPalette();
