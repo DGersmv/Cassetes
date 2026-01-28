@@ -559,7 +559,7 @@
                         document.getElementById('slopeWidth0').value = settings.type0.slopeWidth || 285;
                     }
                     
-                    // Параметры для типов 1-2
+                    // Параметры для типов 1-2 (включая общие offsetX, offsetY, offsetTop)
                     if (settings.type1_2) {
                         document.getElementById('plankWidth12').value = settings.type1_2.plankWidth || 160;
                         document.getElementById('slopeWidth12').value = settings.type1_2.slopeWidth || 225;
@@ -584,7 +584,7 @@
                     }
                     
                     // Загружаем высоту этажа
-                    if (settings.wallIdForFloorHeight) {
+                    if (settings.wallIdForFloorHeight && window.ACAPI && window.ACAPI.GetFloorHeightFromWall) {
                         try {
                             const result = await window.ACAPI.GetFloorHeightFromWall(settings.wallIdForFloorHeight);
                             if (result && result.found && result.height > 0) {
