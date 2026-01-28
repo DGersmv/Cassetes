@@ -60,16 +60,20 @@
             }
         }
         .param-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: minmax(90px, 1fr) minmax(0, 1fr) auto auto;
             align-items: center;
-            gap: 5px;
+            column-gap: 6px;
+            row-gap: 4px;
         }
         .param-row label {
-            min-width: 100px;
+            min-width: 0;
             font-size: 11px;
         }
-        .param-row input {
-            width: 70px;
+        .param-row input,
+        .param-row select {
+            width: 100%;
+            min-width: 0;
             padding: 4px 6px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -77,6 +81,7 @@
         .param-row span {
             font-size: 10px;
             color: #888;
+            white-space: nowrap;
         }
         .btn {
             padding: 8px 16px;
@@ -132,7 +137,7 @@
         }
         .table-container {
             max-height: 150px;
-            overflow-y: auto;
+            overflow: auto;
         }
         .duplicate {
             background: #ffebee !important;
@@ -161,12 +166,12 @@
         }
         .results-grid {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
         }
-        @media (min-width: 700px) {
+        @media (max-width: 700px) {
             .results-grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr;
             }
         }
         .result-block {
@@ -193,7 +198,7 @@
             display: none;
         }
         #targetIds .param-row input {
-            width: 100px;
+            width: 100%;
         }
     </style>
 </head>
