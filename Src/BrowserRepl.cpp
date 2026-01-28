@@ -181,6 +181,7 @@ void BrowserRepl::RegisterACAPIJavaScriptObject(DG::Browser& browser)
         type0->AddItem("slopeWidth", new JS::Value(settings.type0.slopeWidth));
         type0->AddItem("offsetX", new JS::Value(settings.type0.offsetX));
         type0->AddItem("offsetY", new JS::Value(settings.type0.offsetY));
+        type0->AddItem("cassetteId", new JS::Value(settings.type0.cassetteId));
         type0->AddItem("plankId", new JS::Value(settings.type0.plankId));
         type0->AddItem("leftSlopeId", new JS::Value(settings.type0.leftSlopeId));
         type0->AddItem("rightSlopeId", new JS::Value(settings.type0.rightSlopeId));
