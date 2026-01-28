@@ -21,7 +21,7 @@
             margin: 0;
             padding: 10px;
             overflow-y: auto;
-            overflow-x: auto;
+            overflow-x: hidden;
             min-height: 100%;
         }
         .section {
@@ -30,6 +30,8 @@
             padding: 10px;
             margin-bottom: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            max-width: 100%;
+            min-width: 0;
         }
         .section-title {
             font-weight: bold;
@@ -50,25 +52,19 @@
             cursor: pointer;
         }
         .params-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        @media (max-width: 560px) {
-            .params-grid {
-                grid-template-columns: 1fr;
-            }
+            display: block;
         }
         .param-row {
-            display: grid;
-            grid-template-columns: minmax(90px, 1fr) minmax(0, 1fr) auto auto;
+            display: flex;
+            flex-wrap: wrap;
             align-items: center;
-            column-gap: 6px;
-            row-gap: 4px;
+            gap: 6px;
+            width: 100%;
         }
         .param-row label {
             min-width: 0;
             font-size: 11px;
+            flex: 0 1 140px;
         }
         .param-row input,
         .param-row select {
@@ -77,11 +73,16 @@
             padding: 4px 6px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            flex: 1 1 140px;
         }
         .param-row span {
             font-size: 10px;
             color: #888;
             white-space: nowrap;
+            flex: 0 0 auto;
+        }
+        .param-row button {
+            flex: 0 0 auto;
         }
         .btn {
             padding: 8px 16px;
@@ -125,11 +126,13 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 11px;
+            table-layout: fixed;
         }
         th, td {
             padding: 6px 8px;
             text-align: left;
             border-bottom: 1px solid #eee;
+            word-break: break-word;
         }
         th {
             background: #f8f9fa;
@@ -154,31 +157,15 @@
         .status.success {
             color: #2e7d32;
         }
-        .two-col-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-        }
-        @media (min-width: 600px) {
-            .two-col-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
         .results-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-        }
-        @media (max-width: 700px) {
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
+            display: block;
         }
         .result-block {
             background: #f8f9fa;
             border-radius: 4px;
             padding: 8px;
             min-width: 0;
+            margin-bottom: 10px;
         }
         .result-block h4 {
             font-size: 11px;
@@ -199,6 +186,9 @@
         }
         #targetIds .param-row input {
             width: 100%;
+        }
+        .two-col-grid {
+            display: block;
         }
     </style>
 </head>
