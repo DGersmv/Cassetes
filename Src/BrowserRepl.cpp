@@ -216,13 +216,15 @@ void BrowserRepl::RegisterACAPIJavaScriptObject(DG::Browser& browser)
             CassetteSettingsPalette::ShowPalette();
             success = true;
         } catch (const GS::Exception& e) {
-            errorMessage = GS::UniString("Ошибка открытия палитры: ") + e.GetMessage();
+            errorMessage = e.GetMessage();
         } catch (...) {
             errorMessage = "Неизвестная ошибка при открытии палитры настроек";
         }
         
         result->AddItem("success", new JS::Value(success));
-        result->AddItem("errorMessage", new JS::Value(errorMessage));
+        if (!success) {
+            result->AddItem("errorMessage", new JS::Value(errorMessage));
+        }
         
         return result;
     }));
