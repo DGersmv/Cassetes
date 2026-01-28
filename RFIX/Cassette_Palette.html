@@ -352,6 +352,64 @@
         // Данные
         let windowsData = [];
         let calculationResult = null;
+        let wallIdForFloorHeight = 'СН-МД1';
+        let showDuplicateWarning = true;
+
+        function setFieldValue(id, value) {
+            const el = document.getElementById(id);
+            if (el && value !== undefined && value !== null) {
+                el.value = value;
+            }
+        }
+
+        function applySettings(settings) {
+            if (!settings) return;
+
+            if (typeof settings.showDuplicateWarning === 'boolean') {
+                showDuplicateWarning = settings.showDuplicateWarning;
+            }
+
+            if (typeof settings.wallIdForFloorHeight === 'string' && settings.wallIdForFloorHeight.length > 0) {
+                wallIdForFloorHeight = settings.wallIdForFloorHeight;
+            }
+
+            const type0 = settings.type0 || {};
+            const type12 = settings.type1_2 || settings.type12 || {};
+
+            setFieldValue('plankWidth0', type0.plankWidth);
+            setFieldValue('slopeWidth0', type0.slopeWidth);
+            setFieldValue('offsetX', type0.offsetX !== undefined ? type0.offsetX : type12.offsetX);
+            setFieldValue('offsetY', type0.offsetY !== undefined ? type0.offsetY : type12.offsetY);
+            setFieldValue('offsetTop', type12.x2Coeff);
+
+            setFieldValue('plankWidth12', type12.plankWidth);
+            setFieldValue('slopeWidth12', type12.slopeWidth);
+
+            setFieldValue('plankId0', type0.plankId);
+            setFieldValue('leftSlopeId0', type0.leftSlopeId);
+            setFieldValue('rightSlopeId0', type0.rightSlopeId);
+
+            setFieldValue('cassetteId12', type12.cassetteId);
+            setFieldValue('plankId12', type12.plankId);
+            setFieldValue('leftSlopeId12', type12.leftSlopeId);
+            setFieldValue('rightSlopeId12', type12.rightSlopeId);
+        }
+
+        async function loadSettings() {
+            if (!window.ACAPI || !window.ACAPI.GetCassetteSettings) {
+                return;
+            }
+
+            try {
+                let settings = window.ACAPI.GetCassetteSettings();
+                if (settings && typeof settings.then === 'function') {
+                    settings = await settings;
+                }
+                applySettings(settings);
+            } catch (e) {
+                console.warn('Не удалось загрузить настройки кассет:', e);
+            }
+        }
 
         // Загрузить выделение
         async function loadSelection() {
@@ -440,7 +498,7 @@
                     document.getElementById('windowsStatus').className = 'status success';
                     
                     // Показываем предупреждение о дубликатах
-                    if (result.duplicates && result.duplicates.length > 0) {
+                    if (showDuplicateWarning && result.duplicates && result.duplicates.length > 0) {
                         const dupMsg = `Найдены дубликаты ID: ${result.duplicates.join(', ')}`;
                         document.getElementById('windowsStatus').textContent += '. ' + dupMsg;
                         document.getElementById('windowsStatus').className = 'status error';
@@ -470,11 +528,14 @@
             }
             
             // Находим дубликаты
+            const shouldFlagDuplicates = showDuplicateWarning;
             const idCount = {};
-            windowsData.forEach(w => idCount[w.id] = (idCount[w.id] || 0) + 1);
+            if (shouldFlagDuplicates) {
+                windowsData.forEach(w => idCount[w.id] = (idCount[w.id] || 0) + 1);
+            }
             
             tbody.innerHTML = windowsData.map(w => {
-                const isDuplicate = idCount[w.id] > 1;
+                const isDuplicate = shouldFlagDuplicates && idCount[w.id] > 1;
                 return `<tr class="${isDuplicate ? 'duplicate' : ''}">
                     <td>${isDuplicate ? '🔴 ' : ''}${w.id}</td>
                     <td>${w.width.toFixed(3)}</td>
@@ -493,7 +554,8 @@
                     return;
                 }
                 
-                const result = await window.ACAPI.GetFloorHeightFromWall('СН-МД1');
+                const wallId = wallIdForFloorHeight || 'СН-МД1';
+                const result = await window.ACAPI.GetFloorHeightFromWall(wallId);
                 console.log('GetFloorHeightFromWall result:', result);
                 
                 if (result && result.found && result.height > 0) {
@@ -854,7 +916,17 @@
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
-            // Все элементы видны по умолчанию
+            loadSettings();
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                loadSettings();
+            }
+        });
+
+        window.addEventListener('focus', () => {
+            loadSettings();
         });
     </script>
 </body>

@@ -2,7 +2,7 @@
 #define CASSETTESETTINGS_HPP
 
 // =============================================================================
-// CassetteSettings - Загрузка и сохранение настроек в JSON
+// CassetteSettings - Загрузка и сохранение настроек в CSV
 // =============================================================================
 
 #include "CassetteHelper.hpp"
@@ -39,7 +39,7 @@ struct Settings {
 Settings GetDefaultSettings();
 
 // Загрузить настройки из файла
-// Путь: %APPDATA%/GRAPHISOFT/CassettePanel/settings.json
+// Путь: %APPDATA%/GRAPHISOFT/CassettePanel/settings.csv
 bool LoadSettings(Settings& settings);
 
 // Сохранить настройки в файл

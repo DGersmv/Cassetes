@@ -380,30 +380,45 @@
         async function saveSettings() {
             const settings = collectSettings();
             try {
-                // TODO: Вызвать SaveCassetteSettings через ACAPI
-                // await window.ACAPI.SaveCassetteSettings(settings);
-                
-                // Пока сохраняем в localStorage
-                localStorage.setItem('cassetteSettings', JSON.stringify(settings));
+                if (window.ACAPI && window.ACAPI.SaveCassetteSettings) {
+                    let result = window.ACAPI.SaveCassetteSettings(settings);
+                    if (result && typeof result.then === 'function') {
+                        result = await result;
+                    }
+                    if (result && result.success === false) {
+                        throw new Error(result.errorMessage || 'Не удалось сохранить настройки');
+                    }
+                } else {
+                    localStorage.setItem('cassetteSettings', JSON.stringify(settings));
+                }
                 showStatus('Настройки сохранены');
             } catch (e) {
-                showStatus('Ошибка сохранения: ' + e, true);
+                const message = (e && e.message) ? e.message : e;
+                showStatus('Ошибка сохранения: ' + message, true);
             }
         }
 
         // Загрузить настройки
         async function loadSettings() {
             try {
-                // TODO: Вызвать GetCassetteSettings через ACAPI
-                // const settings = await window.ACAPI.GetCassetteSettings();
-                
-                // Пока из localStorage
-                const stored = localStorage.getItem('cassetteSettings');
-                const settings = stored ? JSON.parse(stored) : getDefaultSettings();
+                let settings = null;
+                if (window.ACAPI && window.ACAPI.GetCassetteSettings) {
+                    settings = window.ACAPI.GetCassetteSettings();
+                    if (settings && typeof settings.then === 'function') {
+                        settings = await settings;
+                    }
+                } else {
+                    const stored = localStorage.getItem('cassetteSettings');
+                    settings = stored ? JSON.parse(stored) : getDefaultSettings();
+                }
+                if (!settings) {
+                    settings = getDefaultSettings();
+                }
                 applySettings(settings);
                 showStatus('Настройки загружены');
             } catch (e) {
-                showStatus('Ошибка загрузки: ' + e, true);
+                const message = (e && e.message) ? e.message : e;
+                showStatus('Ошибка загрузки: ' + message, true);
             }
         }
 

@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <string>
 
 namespace CassetteSettings {
 
@@ -33,6 +34,15 @@ GS::UniString GetSettingsFilePath()
     if (appData.IsEmpty()) {
         return GS::UniString();
     }
+    return appData + "\\GRAPHISOFT\\CassettePanel\\settings.csv";
+}
+
+static GS::UniString GetLegacySettingsFilePath()
+{
+    GS::UniString appData = GetAppDataPath();
+    if (appData.IsEmpty()) {
+        return GS::UniString();
+    }
     return appData + "\\GRAPHISOFT\\CassettePanel\\settings.txt";
 }
 
@@ -41,6 +51,94 @@ static bool EnsureDirectoryExists(const GS::UniString& dirPath)
 {
     std::wstring wpath(dirPath.ToUStr().Get());
     return CreateDirectoryW(wpath.c_str(), NULL) || GetLastError() == ERROR_ALREADY_EXISTS;
+}
+
+static std::wstring EscapeCsvValue(const std::wstring& value)
+{
+    bool needsQuotes = value.find(L';') != std::wstring::npos ||
+        value.find(L'"') != std::wstring::npos ||
+        value.find(L'\n') != std::wstring::npos ||
+        value.find(L'\r') != std::wstring::npos;
+
+    if (!needsQuotes) {
+        return value;
+    }
+
+    std::wstring escaped;
+    escaped.reserve(value.size() + 2);
+    for (wchar_t ch : value) {
+        if (ch == L'"') {
+            escaped += L"\"\"";
+        } else {
+            escaped += ch;
+        }
+    }
+    return L"\"" + escaped + L"\"";
+}
+
+static void WriteCsvLine(std::wofstream& file, const std::wstring& key, const std::wstring& value)
+{
+    file << key << L';' << EscapeCsvValue(value) << std::endl;
+}
+
+static void WriteCsvLine(std::wofstream& file, const std::wstring& key, int value)
+{
+    WriteCsvLine(file, key, std::to_wstring(value));
+}
+
+static bool ParseCsvLine(const std::wstring& line, std::wstring& key, std::wstring& value)
+{
+    size_t sepPos = line.find(L';');
+    if (sepPos == std::wstring::npos) {
+        return false;
+    }
+
+    key = line.substr(0, sepPos);
+    value = line.substr(sepPos + 1);
+
+    if (value.size() >= 2 && value.front() == L'"' && value.back() == L'"') {
+        std::wstring raw = value.substr(1, value.size() - 2);
+        std::wstring unescaped;
+        unescaped.reserve(raw.size());
+        for (size_t i = 0; i < raw.size(); ++i) {
+            if (raw[i] == L'"' && i + 1 < raw.size() && raw[i + 1] == L'"') {
+                unescaped += L'"';
+                ++i;
+            } else {
+                unescaped += raw[i];
+            }
+        }
+        value = unescaped;
+    }
+
+    return true;
+}
+
+static void ParseSettingsFile(std::wifstream& file, std::map<std::wstring, std::wstring>& values)
+{
+    std::wstring line;
+    while (std::getline(file, line)) {
+        if (line.empty()) {
+            continue;
+        }
+
+        std::wstring key;
+        std::wstring value;
+        if (ParseCsvLine(line, key, value)) {
+            if (key == L"key") {
+                continue;
+            }
+            values[key] = value;
+            continue;
+        }
+
+        size_t pos = line.find(L'=');
+        if (pos != std::wstring::npos) {
+            key = line.substr(0, pos);
+            value = line.substr(pos + 1);
+            values[key] = value;
+        }
+    }
 }
 
 // =============================================================================
@@ -86,32 +184,29 @@ Settings GetDefaultSettings()
 
 bool LoadSettings(Settings& settings)
 {
+    settings = GetDefaultSettings();
+
     GS::UniString filePath = GetSettingsFilePath();
     if (filePath.IsEmpty()) {
-        settings = GetDefaultSettings();
         return false;
     }
-    
+
     std::wifstream file(filePath.ToUStr().Get());
     if (!file.is_open()) {
-        settings = GetDefaultSettings();
-        return false;
-    }
-    
-    // Начинаем с defaults
-    settings = GetDefaultSettings();
-    
-    // Парсим простой формат key=value
-    std::map<std::wstring, std::wstring> values;
-    std::wstring line;
-    while (std::getline(file, line)) {
-        size_t pos = line.find(L'=');
-        if (pos != std::wstring::npos) {
-            std::wstring key = line.substr(0, pos);
-            std::wstring value = line.substr(pos + 1);
-            values[key] = value;
+        GS::UniString legacyPath = GetLegacySettingsFilePath();
+        if (!legacyPath.IsEmpty()) {
+            file.clear();
+            file.open(legacyPath.ToUStr().Get());
         }
     }
+
+    if (!file.is_open()) {
+        return false;
+    }
+
+    // Парсим CSV или legacy key=value
+    std::map<std::wstring, std::wstring> values;
+    ParseSettingsFile(file, values);
     file.close();
     
     // Применяем значения
@@ -140,6 +235,8 @@ bool LoadSettings(Settings& settings)
     settings.type0.slopeWidth = getInt(L"type0.slopeWidth", 285);
     settings.type0.offsetX = getInt(L"type0.offsetX", 165);
     settings.type0.offsetY = getInt(L"type0.offsetY", 50);
+    settings.type0.x2Coeff = getInt(L"type0.x2Coeff", 745);
+    settings.type0.cassetteId = getString(L"type0.cassetteId", "");
     settings.type0.plankId = getString(L"type0.plankId", "OK-0_PLNK");
     settings.type0.leftSlopeId = getString(L"type0.leftSlopeId", "OK-0_LOTK");
     settings.type0.rightSlopeId = getString(L"type0.rightSlopeId", "OK-0_ROTK");
@@ -179,30 +276,33 @@ bool SaveSettings(const Settings& settings)
         return false;
     }
     
-    // Записываем в формате key=value
-    file << L"defaultType=" << settings.defaultType << std::endl;
-    file << L"wallIdForFloorHeight=" << settings.wallIdForFloorHeight.ToUStr().Get() << std::endl;
-    file << L"showDuplicateWarning=" << (settings.showDuplicateWarning ? 1 : 0) << std::endl;
+    // Записываем CSV (key;value)
+    file << L"key;value" << std::endl;
+    WriteCsvLine(file, L"defaultType", settings.defaultType);
+    WriteCsvLine(file, L"wallIdForFloorHeight", settings.wallIdForFloorHeight.ToUStr().Get());
+    WriteCsvLine(file, L"showDuplicateWarning", settings.showDuplicateWarning ? 1 : 0);
     
     // Тип 0
-    file << L"type0.plankWidth=" << settings.type0.plankWidth << std::endl;
-    file << L"type0.slopeWidth=" << settings.type0.slopeWidth << std::endl;
-    file << L"type0.offsetX=" << settings.type0.offsetX << std::endl;
-    file << L"type0.offsetY=" << settings.type0.offsetY << std::endl;
-    file << L"type0.plankId=" << settings.type0.plankId.ToUStr().Get() << std::endl;
-    file << L"type0.leftSlopeId=" << settings.type0.leftSlopeId.ToUStr().Get() << std::endl;
-    file << L"type0.rightSlopeId=" << settings.type0.rightSlopeId.ToUStr().Get() << std::endl;
+    WriteCsvLine(file, L"type0.plankWidth", settings.type0.plankWidth);
+    WriteCsvLine(file, L"type0.slopeWidth", settings.type0.slopeWidth);
+    WriteCsvLine(file, L"type0.offsetX", settings.type0.offsetX);
+    WriteCsvLine(file, L"type0.offsetY", settings.type0.offsetY);
+    WriteCsvLine(file, L"type0.x2Coeff", settings.type0.x2Coeff);
+    WriteCsvLine(file, L"type0.cassetteId", settings.type0.cassetteId.ToUStr().Get());
+    WriteCsvLine(file, L"type0.plankId", settings.type0.plankId.ToUStr().Get());
+    WriteCsvLine(file, L"type0.leftSlopeId", settings.type0.leftSlopeId.ToUStr().Get());
+    WriteCsvLine(file, L"type0.rightSlopeId", settings.type0.rightSlopeId.ToUStr().Get());
     
     // Тип 1-2
-    file << L"type1_2.plankWidth=" << settings.type1_2.plankWidth << std::endl;
-    file << L"type1_2.slopeWidth=" << settings.type1_2.slopeWidth << std::endl;
-    file << L"type1_2.offsetX=" << settings.type1_2.offsetX << std::endl;
-    file << L"type1_2.offsetY=" << settings.type1_2.offsetY << std::endl;
-    file << L"type1_2.x2Coeff=" << settings.type1_2.x2Coeff << std::endl;
-    file << L"type1_2.cassetteId=" << settings.type1_2.cassetteId.ToUStr().Get() << std::endl;
-    file << L"type1_2.plankId=" << settings.type1_2.plankId.ToUStr().Get() << std::endl;
-    file << L"type1_2.leftSlopeId=" << settings.type1_2.leftSlopeId.ToUStr().Get() << std::endl;
-    file << L"type1_2.rightSlopeId=" << settings.type1_2.rightSlopeId.ToUStr().Get() << std::endl;
+    WriteCsvLine(file, L"type1_2.plankWidth", settings.type1_2.plankWidth);
+    WriteCsvLine(file, L"type1_2.slopeWidth", settings.type1_2.slopeWidth);
+    WriteCsvLine(file, L"type1_2.offsetX", settings.type1_2.offsetX);
+    WriteCsvLine(file, L"type1_2.offsetY", settings.type1_2.offsetY);
+    WriteCsvLine(file, L"type1_2.x2Coeff", settings.type1_2.x2Coeff);
+    WriteCsvLine(file, L"type1_2.cassetteId", settings.type1_2.cassetteId.ToUStr().Get());
+    WriteCsvLine(file, L"type1_2.plankId", settings.type1_2.plankId.ToUStr().Get());
+    WriteCsvLine(file, L"type1_2.leftSlopeId", settings.type1_2.leftSlopeId.ToUStr().Get());
+    WriteCsvLine(file, L"type1_2.rightSlopeId", settings.type1_2.rightSlopeId.ToUStr().Get());
     
     file.close();
     return true;
