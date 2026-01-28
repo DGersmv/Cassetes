@@ -181,6 +181,7 @@ void BrowserRepl::RegisterACAPIJavaScriptObject(DG::Browser& browser)
         type0->AddItem("slopeWidth", new JS::Value(settings.type0.slopeWidth));
         type0->AddItem("offsetX", new JS::Value(settings.type0.offsetX));
         type0->AddItem("offsetY", new JS::Value(settings.type0.offsetY));
+        type0->AddItem("cassetteId", new JS::Value(settings.type0.cassetteId));
         type0->AddItem("plankId", new JS::Value(settings.type0.plankId));
         type0->AddItem("leftSlopeId", new JS::Value(settings.type0.leftSlopeId));
         type0->AddItem("rightSlopeId", new JS::Value(settings.type0.rightSlopeId));
@@ -201,6 +202,78 @@ void BrowserRepl::RegisterACAPIJavaScriptObject(DG::Browser& browser)
 		
 		return result;
 	}));
+
+    // ------------------------------------------------------------
+    // SaveCassetteSettings - сохранить настройки
+    // ------------------------------------------------------------
+
+    jsACAPI->AddItem(new JS::Function("SaveCassetteSettings", [](GS::Ref<JS::Base> param) -> GS::Ref<JS::Base> {
+        GS::Ref<JS::Object> result = new JS::Object();
+        bool success = false;
+        GS::UniString errorMessage;
+        
+        if (GS::Ref<JS::Object> jsParam = GS::DynamicCast<JS::Object>(param)) {
+            const GS::HashTable<GS::UniString, GS::Ref<JS::Base>>& itemTable = jsParam->GetItemTable();
+            
+            // Загружаем существующие настройки, чтобы не потерять не переданные поля
+            CassetteSettings::Settings settings;
+            CassetteSettings::LoadSettings(settings);
+            
+            // Основные настройки
+            GS::Ref<JS::Base> item;
+            if (itemTable.Get("defaultType", &item)) settings.defaultType = GetIntFromJs(item);
+            if (itemTable.Get("wallIdForFloorHeight", &item)) settings.wallIdForFloorHeight = GetStringFromJs(item);
+            if (itemTable.Get("showDuplicateWarning", &item)) settings.showDuplicateWarning = GetBoolFromJs(item);
+            
+            // Тип 0
+            GS::Ref<JS::Base> type0Base;
+            if (itemTable.Get("type0", &type0Base)) {
+                if (GS::Ref<JS::Object> jsType0 = GS::DynamicCast<JS::Object>(type0Base)) {
+                    const GS::HashTable<GS::UniString, GS::Ref<JS::Base>>& type0Table = jsType0->GetItemTable();
+                    GS::Ref<JS::Base> t0item;
+                    if (type0Table.Get("plankWidth", &t0item)) settings.type0.plankWidth = GetIntFromJs(t0item);
+                    if (type0Table.Get("slopeWidth", &t0item)) settings.type0.slopeWidth = GetIntFromJs(t0item);
+                    if (type0Table.Get("offsetX", &t0item)) settings.type0.offsetX = GetIntFromJs(t0item);
+                    if (type0Table.Get("offsetY", &t0item)) settings.type0.offsetY = GetIntFromJs(t0item);
+                    if (type0Table.Get("cassetteId", &t0item)) settings.type0.cassetteId = GetStringFromJs(t0item);
+                    if (type0Table.Get("plankId", &t0item)) settings.type0.plankId = GetStringFromJs(t0item);
+                    if (type0Table.Get("leftSlopeId", &t0item)) settings.type0.leftSlopeId = GetStringFromJs(t0item);
+                    if (type0Table.Get("rightSlopeId", &t0item)) settings.type0.rightSlopeId = GetStringFromJs(t0item);
+                }
+            }
+            
+            // Тип 1-2
+            GS::Ref<JS::Base> type12Base;
+            if (itemTable.Get("type1_2", &type12Base)) {
+                if (GS::Ref<JS::Object> jsType12 = GS::DynamicCast<JS::Object>(type12Base)) {
+                    const GS::HashTable<GS::UniString, GS::Ref<JS::Base>>& type12Table = jsType12->GetItemTable();
+                    GS::Ref<JS::Base> t12item;
+                    if (type12Table.Get("plankWidth", &t12item)) settings.type1_2.plankWidth = GetIntFromJs(t12item);
+                    if (type12Table.Get("slopeWidth", &t12item)) settings.type1_2.slopeWidth = GetIntFromJs(t12item);
+                    if (type12Table.Get("offsetX", &t12item)) settings.type1_2.offsetX = GetIntFromJs(t12item);
+                    if (type12Table.Get("offsetY", &t12item)) settings.type1_2.offsetY = GetIntFromJs(t12item);
+                    if (type12Table.Get("x2Coeff", &t12item)) settings.type1_2.x2Coeff = GetIntFromJs(t12item);
+                    if (type12Table.Get("cassetteId", &t12item)) settings.type1_2.cassetteId = GetStringFromJs(t12item);
+                    if (type12Table.Get("plankId", &t12item)) settings.type1_2.plankId = GetStringFromJs(t12item);
+                    if (type12Table.Get("leftSlopeId", &t12item)) settings.type1_2.leftSlopeId = GetStringFromJs(t12item);
+                    if (type12Table.Get("rightSlopeId", &t12item)) settings.type1_2.rightSlopeId = GetStringFromJs(t12item);
+                }
+            }
+            
+            // Сохраняем настройки
+            success = CassetteSettings::SaveSettings(settings);
+            if (!success) {
+                errorMessage = "Не удалось сохранить настройки в файл";
+            }
+        } else {
+            errorMessage = "Неверные параметры";
+        }
+        
+        result->AddItem("success", new JS::Value(success));
+        result->AddItem("errorMessage", new JS::Value(errorMessage));
+        
+        return result;
+    }));
 
     // ------------------------------------------------------------
     // CalculateCassettes - выполнить расчёт кассет
