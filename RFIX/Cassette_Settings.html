@@ -108,67 +108,51 @@
             background: #f8d7da;
             color: #721c24;
         }
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid #ddd;
-            margin-bottom: 10px;
-        }
-        .tab {
-            padding: 8px 16px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
-        }
-        .tab:hover {
-            background: #f0f0f0;
-        }
-        .tab.active {
-            border-bottom-color: #007bff;
-            color: #007bff;
-            font-weight: bold;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
     </style>
 </head>
 <body>
     <!-- Общие настройки -->
     <div class="section">
-        <div class="section-title">Общие настройки</div>
+        <div class="section-title">⚙️ Общие настройки</div>
         <div class="params-grid">
             <div class="param-row">
-                <label>Тип по умолчанию:</label>
-                <select id="defaultType">
-                    <option value="0">Тип 0 (планки+откосы)</option>
-                    <option value="1">Тип 1 (одна кассета)</option>
-                    <option value="2">Тип 2 (две кассеты)</option>
-                </select>
+                <label>ID стены для высоты этажа:</label>
+                <input type="text" id="wallIdForFloorHeight" placeholder="СН-МД1">
             </div>
             <div class="param-row">
-                <label>ID стены для высоты:</label>
-                <input type="text" id="wallIdForFloorHeight" value="СН-МД1">
+                <label>Показывать предупреждение о дубликатах:</label>
+                <input type="checkbox" id="showDuplicateWarning">
             </div>
-            <div class="param-row">
-                <label>Предупреждать о дубликатах:</label>
-                <input type="checkbox" id="showDuplicateWarning" checked>
+        </div>
+        
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+            <div style="font-weight: bold; margin-bottom: 10px; font-size: 11px; color: #555;">Общие параметры расчёта:</div>
+            <div class="params-grid">
+                <div class="param-row">
+                    <label>Низ плюс к низу этажа:</label>
+                    <input type="number" id="offsetX" value="165">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Смещение Y:</label>
+                    <input type="number" id="offsetY" value="50">
+                    <span>мм</span>
+                </div>
+                <div class="param-row">
+                    <label>Верх плюс к высоте этажа:</label>
+                    <input type="number" id="offsetTop" value="745">
+                    <span>мм</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Настройки по типам -->
+    <!-- Настройки Тип 0 -->
     <div class="section">
-        <div class="tabs">
-            <div class="tab active" data-tab="type0">Тип 0</div>
-            <div class="tab" data-tab="type12">Типы 1/2</div>
-        </div>
-
-        <!-- Тип 0 -->
-        <div class="tab-content active" id="type0">
-            <div class="section-title">Настройки Тип 0</div>
+        <div class="section-title">🔷 Настройки Тип 0</div>
+        
+        <div style="margin-bottom: 15px;">
+            <div style="font-weight: bold; margin-bottom: 8px; font-size: 11px; color: #555;">Размеры элементов:</div>
             <div class="params-grid">
                 <div class="param-row">
                     <label>Ширина планки:</label>
@@ -180,37 +164,34 @@
                     <input type="number" id="type0_slopeWidth" value="285">
                     <span>мм</span>
                 </div>
-                <div class="param-row">
-                    <label>Смещение X:</label>
-                    <input type="number" id="type0_offsetX" value="165">
-                    <span>мм</span>
-                </div>
-                <div class="param-row">
-                    <label>Смещение Y:</label>
-                    <input type="number" id="type0_offsetY" value="50">
-                    <span>мм</span>
-                </div>
             </div>
-            <div class="section-title" style="margin-top:15px;">Целевые объекты (Тип 0)</div>
+        </div>
+        
+        <div style="padding-top: 15px; border-top: 1px solid #eee;">
+            <div style="font-weight: bold; margin-bottom: 8px; font-size: 11px; color: #555;">ID целевых объектов:</div>
             <div class="params-grid">
                 <div class="param-row">
-                    <label>ID планки:</label>
-                    <input type="text" id="type0_plankId" value="OK-0_PLNK">
+                    <label>ID планок:</label>
+                    <input type="text" id="type0_plankId" placeholder="OK-0_PLNK">
                 </div>
                 <div class="param-row">
-                    <label>ID левого откоса:</label>
-                    <input type="text" id="type0_leftSlopeId" value="OK-0_LOTK">
+                    <label>ID левых откосов:</label>
+                    <input type="text" id="type0_leftSlopeId" placeholder="OK-0_LOTK">
                 </div>
                 <div class="param-row">
-                    <label>ID правого откоса:</label>
-                    <input type="text" id="type0_rightSlopeId" value="OK-0_ROTK">
+                    <label>ID правых откосов:</label>
+                    <input type="text" id="type0_rightSlopeId" placeholder="OK-0_ROTK">
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Типы 1/2 -->
-        <div class="tab-content" id="type12">
-            <div class="section-title">Настройки Типы 1/2</div>
+    <!-- Настройки Типы 1-2 -->
+    <div class="section">
+        <div class="section-title">🔶 Настройки Типы 1-2</div>
+        
+        <div style="margin-bottom: 15px;">
+            <div style="font-weight: bold; margin-bottom: 8px; font-size: 11px; color: #555;">Размеры элементов:</div>
             <div class="params-grid">
                 <div class="param-row">
                     <label>Ширина планки:</label>
@@ -222,39 +203,27 @@
                     <input type="number" id="type12_slopeWidth" value="225">
                     <span>мм</span>
                 </div>
-                <div class="param-row">
-                    <label>Смещение X:</label>
-                    <input type="number" id="type12_offsetX" value="165">
-                    <span>мм</span>
-                </div>
-                <div class="param-row">
-                    <label>Смещение Y:</label>
-                    <input type="number" id="type12_offsetY" value="50">
-                    <span>мм</span>
-                </div>
-                <div class="param-row">
-                    <label>Коэффициент X2:</label>
-                    <input type="number" id="type12_x2Coeff" value="745">
-                    <span>мм</span>
-                </div>
             </div>
-            <div class="section-title" style="margin-top:15px;">Целевые объекты (Типы 1/2)</div>
+        </div>
+        
+        <div style="padding-top: 15px; border-top: 1px solid #eee;">
+            <div style="font-weight: bold; margin-bottom: 8px; font-size: 11px; color: #555;">ID целевых объектов:</div>
             <div class="params-grid">
                 <div class="param-row">
-                    <label>ID кассеты:</label>
-                    <input type="text" id="type12_cassetteId" value="OK-1_2_CASS">
+                    <label>ID кассет:</label>
+                    <input type="text" id="type12_cassetteId" placeholder="OK-1_2_CASS">
                 </div>
                 <div class="param-row">
-                    <label>ID планки:</label>
-                    <input type="text" id="type12_plankId" value="OK-1_2_PLNK">
+                    <label>ID планок:</label>
+                    <input type="text" id="type12_plankId" placeholder="OK-1_2_PLNK">
                 </div>
                 <div class="param-row">
-                    <label>ID левого откоса:</label>
-                    <input type="text" id="type12_leftSlopeId" value="OK-1_2_LOTK">
+                    <label>ID левых откосов:</label>
+                    <input type="text" id="type12_leftSlopeId" placeholder="OK-1_2_LOTK">
                 </div>
                 <div class="param-row">
-                    <label>ID правого откоса:</label>
-                    <input type="text" id="type12_rightSlopeId" value="OK-1_2_ROTK">
+                    <label>ID правых откосов:</label>
+                    <input type="text" id="type12_rightSlopeId" placeholder="OK-1_2_ROTK">
                 </div>
             </div>
         </div>
@@ -270,72 +239,74 @@
     <div id="status"></div>
 
     <script>
-        // Переключение табов
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                this.classList.add('active');
-                document.getElementById(this.dataset.tab).classList.add('active');
-            });
-        });
-
         // Собрать настройки из формы
         function collectSettings() {
             return {
-                defaultType: parseInt(document.getElementById('defaultType').value),
-                wallIdForFloorHeight: document.getElementById('wallIdForFloorHeight').value,
+                defaultType: 0,
+                wallIdForFloorHeight: document.getElementById('wallIdForFloorHeight').value || 'СН-МД1',
                 showDuplicateWarning: document.getElementById('showDuplicateWarning').checked,
+                
                 type0: {
-                    plankWidth: parseInt(document.getElementById('type0_plankWidth').value),
-                    slopeWidth: parseInt(document.getElementById('type0_slopeWidth').value),
-                    offsetX: parseInt(document.getElementById('type0_offsetX').value),
-                    offsetY: parseInt(document.getElementById('type0_offsetY').value),
+                    plankWidth: parseInt(document.getElementById('type0_plankWidth').value) || 285,
+                    slopeWidth: parseInt(document.getElementById('type0_slopeWidth').value) || 285,
+                    offsetX: parseInt(document.getElementById('offsetX').value) || 165,
+                    offsetY: parseInt(document.getElementById('offsetY').value) || 50,
+                    x2Coeff: parseInt(document.getElementById('offsetTop').value) || 745,
                     cassetteId: '',
-                    plankId: document.getElementById('type0_plankId').value,
-                    leftSlopeId: document.getElementById('type0_leftSlopeId').value,
-                    rightSlopeId: document.getElementById('type0_rightSlopeId').value
+                    plankId: document.getElementById('type0_plankId').value || 'OK-0_PLNK',
+                    leftSlopeId: document.getElementById('type0_leftSlopeId').value || 'OK-0_LOTK',
+                    rightSlopeId: document.getElementById('type0_rightSlopeId').value || 'OK-0_ROTK'
                 },
+                
                 type1_2: {
-                    plankWidth: parseInt(document.getElementById('type12_plankWidth').value),
-                    slopeWidth: parseInt(document.getElementById('type12_slopeWidth').value),
-                    offsetX: parseInt(document.getElementById('type12_offsetX').value),
-                    offsetY: parseInt(document.getElementById('type12_offsetY').value),
-                    x2Coeff: parseInt(document.getElementById('type12_x2Coeff').value),
-                    cassetteId: document.getElementById('type12_cassetteId').value,
-                    plankId: document.getElementById('type12_plankId').value,
-                    leftSlopeId: document.getElementById('type12_leftSlopeId').value,
-                    rightSlopeId: document.getElementById('type12_rightSlopeId').value
+                    plankWidth: parseInt(document.getElementById('type12_plankWidth').value) || 160,
+                    slopeWidth: parseInt(document.getElementById('type12_slopeWidth').value) || 225,
+                    offsetX: parseInt(document.getElementById('offsetX').value) || 165,
+                    offsetY: parseInt(document.getElementById('offsetY').value) || 50,
+                    x2Coeff: parseInt(document.getElementById('offsetTop').value) || 745,
+                    cassetteId: document.getElementById('type12_cassetteId').value || 'OK-1_2_CASS',
+                    plankId: document.getElementById('type12_plankId').value || 'OK-1_2_PLNK',
+                    leftSlopeId: document.getElementById('type12_leftSlopeId').value || 'OK-1_2_LOTK',
+                    rightSlopeId: document.getElementById('type12_rightSlopeId').value || 'OK-1_2_ROTK'
                 }
             };
         }
 
         // Применить настройки к форме
         function applySettings(settings) {
-            document.getElementById('defaultType').value = settings.defaultType;
-            document.getElementById('wallIdForFloorHeight').value = settings.wallIdForFloorHeight;
-            document.getElementById('showDuplicateWarning').checked = settings.showDuplicateWarning;
+            if (!settings) return;
+            
+            // Общие настройки
+            document.getElementById('wallIdForFloorHeight').value = settings.wallIdForFloorHeight || 'СН-МД1';
+            document.getElementById('showDuplicateWarning').checked = settings.showDuplicateWarning !== false;
+            
+            // Общие параметры расчёта (берём из type1_2, так как они общие)
+            const offsetX = settings.type1_2?.offsetX || settings.type0?.offsetX || 165;
+            const offsetY = settings.type1_2?.offsetY || settings.type0?.offsetY || 50;
+            const offsetTop = settings.type1_2?.x2Coeff || settings.type0?.x2Coeff || 745;
+            
+            document.getElementById('offsetX').value = offsetX;
+            document.getElementById('offsetY').value = offsetY;
+            document.getElementById('offsetTop').value = offsetTop;
             
             // Тип 0
-            document.getElementById('type0_plankWidth').value = settings.type0.plankWidth;
-            document.getElementById('type0_slopeWidth').value = settings.type0.slopeWidth;
-            document.getElementById('type0_offsetX').value = settings.type0.offsetX;
-            document.getElementById('type0_offsetY').value = settings.type0.offsetY;
-            document.getElementById('type0_plankId').value = settings.type0.plankId;
-            document.getElementById('type0_leftSlopeId').value = settings.type0.leftSlopeId;
-            document.getElementById('type0_rightSlopeId').value = settings.type0.rightSlopeId;
+            if (settings.type0) {
+                document.getElementById('type0_plankWidth').value = settings.type0.plankWidth || 285;
+                document.getElementById('type0_slopeWidth').value = settings.type0.slopeWidth || 285;
+                document.getElementById('type0_plankId').value = settings.type0.plankId || 'OK-0_PLNK';
+                document.getElementById('type0_leftSlopeId').value = settings.type0.leftSlopeId || 'OK-0_LOTK';
+                document.getElementById('type0_rightSlopeId').value = settings.type0.rightSlopeId || 'OK-0_ROTK';
+            }
             
-            // Тип 1/2
-            document.getElementById('type12_plankWidth').value = settings.type1_2.plankWidth;
-            document.getElementById('type12_slopeWidth').value = settings.type1_2.slopeWidth;
-            document.getElementById('type12_offsetX').value = settings.type1_2.offsetX;
-            document.getElementById('type12_offsetY').value = settings.type1_2.offsetY;
-            document.getElementById('type12_x2Coeff').value = settings.type1_2.x2Coeff;
-            document.getElementById('type12_cassetteId').value = settings.type1_2.cassetteId;
-            document.getElementById('type12_plankId').value = settings.type1_2.plankId;
-            document.getElementById('type12_leftSlopeId').value = settings.type1_2.leftSlopeId;
-            document.getElementById('type12_rightSlopeId').value = settings.type1_2.rightSlopeId;
+            // Типы 1-2
+            if (settings.type1_2) {
+                document.getElementById('type12_plankWidth').value = settings.type1_2.plankWidth || 160;
+                document.getElementById('type12_slopeWidth').value = settings.type1_2.slopeWidth || 225;
+                document.getElementById('type12_cassetteId').value = settings.type1_2.cassetteId || 'OK-1_2_CASS';
+                document.getElementById('type12_plankId').value = settings.type1_2.plankId || 'OK-1_2_PLNK';
+                document.getElementById('type12_leftSlopeId').value = settings.type1_2.leftSlopeId || 'OK-1_2_LOTK';
+                document.getElementById('type12_rightSlopeId').value = settings.type1_2.rightSlopeId || 'OK-1_2_ROTK';
+            }
         }
 
         // Настройки по умолчанию
@@ -349,6 +320,7 @@
                     slopeWidth: 285,
                     offsetX: 165,
                     offsetY: 50,
+                    x2Coeff: 745,
                     cassetteId: '',
                     plankId: 'OK-0_PLNK',
                     leftSlopeId: 'OK-0_LOTK',
