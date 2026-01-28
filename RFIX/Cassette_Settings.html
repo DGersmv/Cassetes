@@ -388,9 +388,9 @@
                     if (result && result.success === false) {
                         throw new Error(result.errorMessage || 'Не удалось сохранить настройки');
                     }
-                } else {
-                    localStorage.setItem('cassetteSettings', JSON.stringify(settings));
                 }
+                // Сохраняем в localStorage для синхронизации палитр
+                localStorage.setItem('cassetteSettings', JSON.stringify(settings));
                 showStatus('Настройки сохранены');
             } catch (e) {
                 const message = (e && e.message) ? e.message : e;

@@ -395,17 +395,37 @@
             setFieldValue('rightSlopeId12', type12.rightSlopeId);
         }
 
-        async function loadSettings() {
-            if (!window.ACAPI || !window.ACAPI.GetCassetteSettings) {
-                return;
+        function loadSettingsFromStorage(rawValue) {
+            const stored = (rawValue !== undefined && rawValue !== null)
+                ? rawValue
+                : localStorage.getItem('cassetteSettings');
+            if (!stored) {
+                return false;
             }
-
             try {
-                let settings = window.ACAPI.GetCassetteSettings();
-                if (settings && typeof settings.then === 'function') {
-                    settings = await settings;
-                }
+                const settings = JSON.parse(stored);
                 applySettings(settings);
+                return true;
+            } catch (e) {
+                console.warn('Не удалось разобрать настройки из localStorage:', e);
+                return false;
+            }
+        }
+
+        async function loadSettings() {
+            try {
+                let settings = null;
+                if (window.ACAPI && window.ACAPI.GetCassetteSettings) {
+                    settings = window.ACAPI.GetCassetteSettings();
+                    if (settings && typeof settings.then === 'function') {
+                        settings = await settings;
+                    }
+                }
+                if (settings) {
+                    applySettings(settings);
+                    return;
+                }
+                loadSettingsFromStorage();
             } catch (e) {
                 console.warn('Не удалось загрузить настройки кассет:', e);
             }
@@ -927,6 +947,16 @@
 
         window.addEventListener('focus', () => {
             loadSettings();
+        });
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'cassetteSettings') {
+                if (window.ACAPI && window.ACAPI.GetCassetteSettings) {
+                    loadSettings();
+                } else {
+                    loadSettingsFromStorage(event.newValue);
+                }
+            }
         });
     </script>
 </body>
