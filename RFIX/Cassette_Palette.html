@@ -380,24 +380,44 @@
 
             const type0 = settings.type0 || {};
             const type12 = settings.type1_2 || settings.type12 || {};
+            const getFlat = (key) => (settings && Object.prototype.hasOwnProperty.call(settings, key))
+                ? settings[key]
+                : undefined;
 
-            setFieldValue('plankWidth0', type0.plankWidth);
-            setFieldValue('slopeWidth0', type0.slopeWidth);
-            setFieldValue('offsetX', type0.offsetX !== undefined ? type0.offsetX : type12.offsetX);
-            setFieldValue('offsetY', type0.offsetY !== undefined ? type0.offsetY : type12.offsetY);
-            setFieldValue('offsetTop', type12.x2Coeff);
+            const plankWidth0 = type0.plankWidth !== undefined ? type0.plankWidth : getFlat('type0.plankWidth');
+            const slopeWidth0 = type0.slopeWidth !== undefined ? type0.slopeWidth : getFlat('type0.slopeWidth');
+            const offsetX = type0.offsetX !== undefined ? type0.offsetX
+                : (type12.offsetX !== undefined ? type12.offsetX : getFlat('type1_2.offsetX'));
+            const offsetY = type0.offsetY !== undefined ? type0.offsetY
+                : (type12.offsetY !== undefined ? type12.offsetY : getFlat('type1_2.offsetY'));
+            const offsetTop = type12.x2Coeff !== undefined ? type12.x2Coeff : getFlat('type1_2.x2Coeff');
 
-            setFieldValue('plankWidth12', type12.plankWidth);
-            setFieldValue('slopeWidth12', type12.slopeWidth);
+            setFieldValue('plankWidth0', plankWidth0);
+            setFieldValue('slopeWidth0', slopeWidth0);
+            setFieldValue('offsetX', offsetX);
+            setFieldValue('offsetY', offsetY);
+            setFieldValue('offsetTop', offsetTop);
 
-            setFieldValue('plankId0', type0.plankId);
-            setFieldValue('leftSlopeId0', type0.leftSlopeId);
-            setFieldValue('rightSlopeId0', type0.rightSlopeId);
+            const plankWidth12 = type12.plankWidth !== undefined ? type12.plankWidth : getFlat('type1_2.plankWidth');
+            const slopeWidth12 = type12.slopeWidth !== undefined ? type12.slopeWidth : getFlat('type1_2.slopeWidth');
+            setFieldValue('plankWidth12', plankWidth12);
+            setFieldValue('slopeWidth12', slopeWidth12);
 
-            setFieldValue('cassetteId12', type12.cassetteId);
-            setFieldValue('plankId12', type12.plankId);
-            setFieldValue('leftSlopeId12', type12.leftSlopeId);
-            setFieldValue('rightSlopeId12', type12.rightSlopeId);
+            const plankId0 = type0.plankId !== undefined ? type0.plankId : getFlat('type0.plankId');
+            const leftSlopeId0 = type0.leftSlopeId !== undefined ? type0.leftSlopeId : getFlat('type0.leftSlopeId');
+            const rightSlopeId0 = type0.rightSlopeId !== undefined ? type0.rightSlopeId : getFlat('type0.rightSlopeId');
+            setFieldValue('plankId0', plankId0);
+            setFieldValue('leftSlopeId0', leftSlopeId0);
+            setFieldValue('rightSlopeId0', rightSlopeId0);
+
+            const cassetteId12 = type12.cassetteId !== undefined ? type12.cassetteId : getFlat('type1_2.cassetteId');
+            const plankId12 = type12.plankId !== undefined ? type12.plankId : getFlat('type1_2.plankId');
+            const leftSlopeId12 = type12.leftSlopeId !== undefined ? type12.leftSlopeId : getFlat('type1_2.leftSlopeId');
+            const rightSlopeId12 = type12.rightSlopeId !== undefined ? type12.rightSlopeId : getFlat('type1_2.rightSlopeId');
+            setFieldValue('cassetteId12', cassetteId12);
+            setFieldValue('plankId12', plankId12);
+            setFieldValue('leftSlopeId12', leftSlopeId12);
+            setFieldValue('rightSlopeId12', rightSlopeId12);
         }
 
         function loadSettingsFromStorage(rawValue) {

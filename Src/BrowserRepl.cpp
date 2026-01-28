@@ -187,6 +187,16 @@ void BrowserRepl::RegisterACAPIJavaScriptObject(DG::Browser& browser)
         type0->AddItem("leftSlopeId", new JS::Value(settings.type0.leftSlopeId));
         type0->AddItem("rightSlopeId", new JS::Value(settings.type0.rightSlopeId));
         result->AddItem("type0", type0);
+        // Дублируем ключи в плоском виде для надёжного доступа
+        result->AddItem("type0.plankWidth", new JS::Value(settings.type0.plankWidth));
+        result->AddItem("type0.slopeWidth", new JS::Value(settings.type0.slopeWidth));
+        result->AddItem("type0.offsetX", new JS::Value(settings.type0.offsetX));
+        result->AddItem("type0.offsetY", new JS::Value(settings.type0.offsetY));
+        result->AddItem("type0.x2Coeff", new JS::Value(settings.type0.x2Coeff));
+        result->AddItem("type0.cassetteId", new JS::Value(settings.type0.cassetteId));
+        result->AddItem("type0.plankId", new JS::Value(settings.type0.plankId));
+        result->AddItem("type0.leftSlopeId", new JS::Value(settings.type0.leftSlopeId));
+        result->AddItem("type0.rightSlopeId", new JS::Value(settings.type0.rightSlopeId));
         
         // Тип 1-2
         GS::Ref<JS::Object> type12 = new JS::Object();
@@ -200,6 +210,15 @@ void BrowserRepl::RegisterACAPIJavaScriptObject(DG::Browser& browser)
         type12->AddItem("leftSlopeId", new JS::Value(settings.type1_2.leftSlopeId));
         type12->AddItem("rightSlopeId", new JS::Value(settings.type1_2.rightSlopeId));
         result->AddItem("type1_2", type12);
+        result->AddItem("type1_2.plankWidth", new JS::Value(settings.type1_2.plankWidth));
+        result->AddItem("type1_2.slopeWidth", new JS::Value(settings.type1_2.slopeWidth));
+        result->AddItem("type1_2.offsetX", new JS::Value(settings.type1_2.offsetX));
+        result->AddItem("type1_2.offsetY", new JS::Value(settings.type1_2.offsetY));
+        result->AddItem("type1_2.x2Coeff", new JS::Value(settings.type1_2.x2Coeff));
+        result->AddItem("type1_2.cassetteId", new JS::Value(settings.type1_2.cassetteId));
+        result->AddItem("type1_2.plankId", new JS::Value(settings.type1_2.plankId));
+        result->AddItem("type1_2.leftSlopeId", new JS::Value(settings.type1_2.leftSlopeId));
+        result->AddItem("type1_2.rightSlopeId", new JS::Value(settings.type1_2.rightSlopeId));
 		
 		return result;
 	}));
