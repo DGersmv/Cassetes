@@ -21,7 +21,8 @@
             margin: 0;
             padding: 10px;
             overflow-y: auto;
-            overflow-x: hidden;
+            overflow-x: auto;
+            min-height: 100%;
         }
         .section {
             background: white;
@@ -52,6 +53,11 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
+        }
+        @media (max-width: 560px) {
+            .params-grid {
+                grid-template-columns: 1fr;
+            }
         }
         .param-row {
             display: flex;
@@ -143,21 +149,31 @@
         .status.success {
             color: #2e7d32;
         }
+        .two-col-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        @media (min-width: 600px) {
+            .two-col-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
         .results-grid {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 10px;
-            align-items: stretch;
+        }
+        @media (min-width: 700px) {
+            .results-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
         .result-block {
             background: #f8f9fa;
             border-radius: 4px;
             padding: 8px;
-            display: flex;
-            flex-direction: column;
-            flex: 1 1 220px;
-            min-width: 200px;
-            min-height: 140px;
+            min-width: 0;
         }
         .result-block h4 {
             font-size: 11px;
@@ -167,19 +183,14 @@
         .result-block ul {
             list-style: none;
             font-size: 11px;
-            flex: 1 1 auto;
-            overflow: auto;
+            margin: 0;
+            padding: 0;
         }
         .result-block li {
             padding: 2px 0;
         }
         .hidden {
             display: none;
-        }
-        #targetIds {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
         }
         #targetIds .param-row input {
             width: 100px;
@@ -305,7 +316,7 @@
             <!-- Объекты для типа 0 -->
             <div style="margin-bottom: 10px;">
                 <div style="font-weight: bold; margin-bottom: 5px; font-size: 10px; color: #666;">Объекты для типа 0:</div>
-                <div id="targetIds0" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div id="targetIds0" class="two-col-grid">
                     <div class="param-row">
                         <label style="min-width: 80px;">Планки:</label>
                         <input type="text" id="plankId0" value="OK-0_PLNK" style="flex: 1;">
@@ -324,7 +335,7 @@
             <!-- Объекты для типов 1-2 -->
             <div>
                 <div style="font-weight: bold; margin-bottom: 5px; font-size: 10px; color: #666;">Объекты для типов 1-2:</div>
-                <div id="targetIds12" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div id="targetIds12" class="two-col-grid">
                     <div class="param-row">
                         <label style="min-width: 80px;">Кассеты:</label>
                         <input type="text" id="cassetteId12" value="OK-1_2_CASS" style="flex: 1;">
