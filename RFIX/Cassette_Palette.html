@@ -525,8 +525,10 @@
         // Загрузить настройки из ACAPI
         async function loadSettings() {
             try {
-                if (!window.ACAPI?.GetCassetteSettings) {
-                    console.warn('ACAPI недоступен');
+                if (!window.ACAPI?.GetCassetteSettings || typeof window.ACAPI.GetCassetteSettings !== 'function') {
+                    const msg = 'ACAPI недоступен - используются значения по умолчанию';
+                    console.warn(msg);
+                    showStatus(msg, true);
                     return;
                 }
                 const settings = await window.ACAPI.GetCassetteSettings();
@@ -549,10 +551,14 @@
                         document.getElementById('leftSlopeId12').value = settings.type1_2.leftSlopeId || 'OK-1_2_LOTK';
                         document.getElementById('rightSlopeId12').value = settings.type1_2.rightSlopeId || 'OK-1_2_ROTK';
                     }
-                    console.log('Настройки загружены');
+                    const msg = 'Настройки загружены';
+                    console.log(msg);
+                    showStatus(msg, false);
                 }
             } catch (e) {
-                console.error('Ошибка загрузки настроек:', e);
+                const msg = 'Ошибка загрузки настроек: ' + e.message;
+                console.error(msg, e);
+                showStatus(msg, true);
             }
         }
 
