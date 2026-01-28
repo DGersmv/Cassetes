@@ -7,7 +7,9 @@
 
 #include <Windows.h>
 #include <ShlObj.h>
+#include <codecvt>
 #include <fstream>
+#include <locale>
 #include <sstream>
 #include <map>
 #include <string>
@@ -51,6 +53,18 @@ static bool EnsureDirectoryExists(const GS::UniString& dirPath)
 {
     std::wstring wpath(dirPath.ToUStr().Get());
     return CreateDirectoryW(wpath.c_str(), NULL) || GetLastError() == ERROR_ALREADY_EXISTS;
+}
+
+static void ImbueUtf8(std::wios& stream)
+{
+    stream.imbue(std::locale(stream.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
+}
+
+static void StripBom(std::wstring& line)
+{
+    if (!line.empty() && line.front() == 0xFEFF) {
+        line.erase(0, 1);
+    }
 }
 
 static std::wstring EscapeCsvValue(const std::wstring& value)
@@ -117,9 +131,15 @@ static bool ParseCsvLine(const std::wstring& line, std::wstring& key, std::wstri
 static void ParseSettingsFile(std::wifstream& file, std::map<std::wstring, std::wstring>& values)
 {
     std::wstring line;
+    bool firstLine = true;
     while (std::getline(file, line)) {
         if (line.empty()) {
             continue;
+        }
+
+        if (firstLine) {
+            StripBom(line);
+            firstLine = false;
         }
 
         std::wstring key;
@@ -192,11 +212,17 @@ bool LoadSettings(Settings& settings)
     }
 
     std::wifstream file(filePath.ToUStr().Get());
+    if (file.is_open()) {
+        ImbueUtf8(file);
+    }
     if (!file.is_open()) {
         GS::UniString legacyPath = GetLegacySettingsFilePath();
         if (!legacyPath.IsEmpty()) {
             file.clear();
             file.open(legacyPath.ToUStr().Get());
+            if (file.is_open()) {
+                ImbueUtf8(file);
+            }
         }
     }
 
@@ -275,9 +301,11 @@ bool SaveSettings(const Settings& settings)
     if (!file.is_open()) {
         return false;
     }
+
+    ImbueUtf8(file);
     
     // Записываем CSV (key;value)
-    file << L"key;value" << std::endl;
+    file << L'\ufeff' << L"key;value" << std::endl;
     WriteCsvLine(file, L"defaultType", settings.defaultType);
     WriteCsvLine(file, L"wallIdForFloorHeight", settings.wallIdForFloorHeight.ToUStr().Get());
     WriteCsvLine(file, L"showDuplicateWarning", settings.showDuplicateWarning ? 1 : 0);
