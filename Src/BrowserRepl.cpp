@@ -7,6 +7,7 @@
 #include "DGBrowser.hpp"
 #include "CassetteHelper.hpp"
 #include "CassetteSettings.hpp"
+#include "CassetteSettingsPalette.hpp"
 
 #include <cmath>
 #include <cstdio>
@@ -267,6 +268,30 @@ void BrowserRepl::RegisterACAPIJavaScriptObject(DG::Browser& browser)
             }
         } else {
             errorMessage = "Неверные параметры";
+        }
+        
+        result->AddItem("success", new JS::Value(success));
+        result->AddItem("errorMessage", new JS::Value(errorMessage));
+        
+        return result;
+    }));
+
+    // ------------------------------------------------------------
+    // OpenSettingsPalette - открыть палитру настроек
+    // ------------------------------------------------------------
+
+    jsACAPI->AddItem(new JS::Function("OpenSettingsPalette", [](GS::Ref<JS::Base>) -> GS::Ref<JS::Base> {
+        GS::Ref<JS::Object> result = new JS::Object();
+        bool success = false;
+        GS::UniString errorMessage;
+        
+        try {
+            CassetteSettingsPalette::ShowPalette();
+            success = true;
+        } catch (const GS::Exception& e) {
+            errorMessage = GS::UniString("Ошибка открытия палитры: ") + e.GetMessage();
+        } catch (...) {
+            errorMessage = "Неизвестная ошибка при открытии палитры настроек";
         }
         
         result->AddItem("success", new JS::Value(success));
