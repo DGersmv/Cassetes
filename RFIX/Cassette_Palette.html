@@ -529,12 +529,28 @@
         // Загрузить настройки из файла
         async function loadSettings() {
             try {
-                if (!window.ACAPI || !window.ACAPI.GetCassetteSettings) {
-                    console.warn('ACAPI.GetCassetteSettings недоступен, используются значения по умолчанию');
-                    return;
+                let settings = null;
+                
+                // Сначала пробуем загрузить из ACAPI
+                if (window.ACAPI && window.ACAPI.GetCassetteSettings) {
+                    try {
+                        settings = await window.ACAPI.GetCassetteSettings();
+                    } catch (e) {
+                        console.warn('Не удалось загрузить из ACAPI:', e);
+                    }
                 }
                 
-                const settings = await window.ACAPI.GetCassetteSettings();
+                // Fallback на localStorage (как в Settings палитре)
+                if (!settings) {
+                    const stored = localStorage.getItem('cassetteSettings');
+                    if (stored) {
+                        settings = JSON.parse(stored);
+                        console.log('Настройки загружены из localStorage');
+                    } else {
+                        console.warn('Настройки не найдены, используются значения по умолчанию');
+                        return;
+                    }
+                }
                 
                 if (settings) {
                     // Параметры для типа 0
