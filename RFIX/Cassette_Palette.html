@@ -238,6 +238,14 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Кнопка обновления настроек -->
+        <div style="margin-top: 10px;">
+            <button class="btn btn-secondary" onclick="loadSettings()" style="padding:6px 12px;font-size:11px;cursor:pointer;">
+                🔄 Обновить настройки
+            </button>
+            <span id="loadSettingsStatus" style="margin-left:10px;font-size:10px;color:#666;"></span>
+        </div>
     </div>
 
     <!-- Окна/Двери -->
@@ -265,9 +273,12 @@
         <div class="status" id="windowsStatus">Загружено: 0 элементов</div>
     </div>
 
-    <!-- Кнопка расчёта -->
+    <!-- Кнопки управления -->
     <div class="section">
         <div class="buttons">
+            <button class="btn btn-secondary" onclick="openSettings()" style="padding:8px 16px;font-size:12px;">
+                ⚙️ Настройки
+            </button>
             <button class="btn btn-primary" onclick="calculate()" id="calcBtn">Рассчитать</button>
             <button class="btn btn-success" onclick="writeResults()" id="writeBtn" disabled>Записать в объекты</button>
             <button class="btn btn-secondary" onclick="exportCSV()" id="exportBtn" disabled>Экспорт CSV</button>
@@ -567,6 +578,88 @@
             } catch (e) {
                 document.getElementById('resultsStatus').textContent = 'Ошибка расчёта: ' + e;
                 document.getElementById('resultsStatus').className = 'status error';
+            }
+        }
+
+        // Загрузить настройки из файла
+        async function loadSettings() {
+            const statusEl = document.getElementById('loadSettingsStatus');
+            
+            try {
+                if (statusEl) statusEl.textContent = '⏳ Загрузка...';
+                
+                if (!window.ACAPI || !window.ACAPI.GetCassetteSettings) {
+                    console.warn('ACAPI.GetCassetteSettings недоступен');
+                    if (statusEl) {
+                        statusEl.textContent = '⚠️ ACAPI недоступен';
+                        statusEl.style.color = '#ff9800';
+                    }
+                    return;
+                }
+                
+                const settings = await window.ACAPI.GetCassetteSettings();
+                
+                if (settings) {
+                    // Параметры для типа 0
+                    if (settings.type0) {
+                        document.getElementById('plankWidth0').value = settings.type0.plankWidth || 285;
+                        document.getElementById('slopeWidth0').value = settings.type0.slopeWidth || 285;
+                        document.getElementById('plankId0').value = settings.type0.plankId || 'OK-0_PLNK';
+                        document.getElementById('leftSlopeId0').value = settings.type0.leftSlopeId || 'OK-0_LOTK';
+                        document.getElementById('rightSlopeId0').value = settings.type0.rightSlopeId || 'OK-0_ROTK';
+                    }
+                    
+                    // Параметры для типов 1-2
+                    if (settings.type1_2) {
+                        document.getElementById('plankWidth12').value = settings.type1_2.plankWidth || 160;
+                        document.getElementById('slopeWidth12').value = settings.type1_2.slopeWidth || 225;
+                        document.getElementById('offsetX').value = settings.type1_2.offsetX || 165;
+                        document.getElementById('offsetY').value = settings.type1_2.offsetY || 50;
+                        document.getElementById('offsetTop').value = settings.type1_2.x2Coeff || 745;
+                        document.getElementById('cassetteId12').value = settings.type1_2.cassetteId || 'OK-1_2_CASS';
+                        document.getElementById('plankId12').value = settings.type1_2.plankId || 'OK-1_2_PLNK';
+                        document.getElementById('leftSlopeId12').value = settings.type1_2.leftSlopeId || 'OK-1_2_LOTK';
+                        document.getElementById('rightSlopeId12').value = settings.type1_2.rightSlopeId || 'OK-1_2_ROTK';
+                    }
+                    
+                    console.log('Настройки загружены успешно');
+                    if (statusEl) {
+                        statusEl.textContent = '✅ Обновлено';
+                        statusEl.style.color = '#28a745';
+                        setTimeout(() => { statusEl.textContent = ''; }, 3000);
+                    }
+                } else {
+                    if (statusEl) {
+                        statusEl.textContent = '⚠️ Настройки не найдены';
+                        statusEl.style.color = '#ff9800';
+                    }
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки настроек:', e);
+                if (statusEl) {
+                    statusEl.textContent = '❌ Ошибка: ' + e.message;
+                    statusEl.style.color = '#c62828';
+                }
+            }
+        }
+
+        // Открыть палитру настроек
+        async function openSettings() {
+            try {
+                if (!window.ACAPI || !window.ACAPI.OpenSettingsPalette) {
+                    alert('⚠️ Функция настроек недоступна.\n\nПроверьте, что:\n1. Используется последняя версия плагина\n2. ArchiCAD перезапущен после установки');
+                    console.error('ACAPI.OpenSettingsPalette не найден');
+                    return;
+                }
+                
+                const result = await window.ACAPI.OpenSettingsPalette();
+                
+                if (result && !result.success) {
+                    alert('Ошибка открытия настроек: ' + (result.errorMessage || 'Неизвестная ошибка'));
+                }
+            } catch (e) {
+                console.error('Ошибка открытия палитры настроек:', e);
+                alert('Ошибка: ' + e.message);
             }
         }
 
