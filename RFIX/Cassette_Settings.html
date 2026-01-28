@@ -380,12 +380,16 @@
         async function saveSettings() {
             const settings = collectSettings();
             try {
-                // TODO: Вызвать SaveCassetteSettings через ACAPI
-                // await window.ACAPI.SaveCassetteSettings(settings);
+                // Сохраняем через ACAPI
+                const result = await window.ACAPI.SaveCassetteSettings(settings);
                 
-                // Пока сохраняем в localStorage
-                localStorage.setItem('cassetteSettings', JSON.stringify(settings));
-                showStatus('Настройки сохранены');
+                if (result && result.success) {
+                    // Также сохраняем в localStorage как резервную копию
+                    localStorage.setItem('cassetteSettings', JSON.stringify(settings));
+                    showStatus('Настройки сохранены');
+                } else {
+                    showStatus('Ошибка сохранения: ' + (result.errorMessage || 'неизвестная ошибка'), true);
+                }
             } catch (e) {
                 showStatus('Ошибка сохранения: ' + e, true);
             }
@@ -394,16 +398,27 @@
         // Загрузить настройки
         async function loadSettings() {
             try {
-                // TODO: Вызвать GetCassetteSettings через ACAPI
-                // const settings = await window.ACAPI.GetCassetteSettings();
+                // Загружаем через ACAPI
+                const settings = await window.ACAPI.GetCassetteSettings();
                 
-                // Пока из localStorage
-                const stored = localStorage.getItem('cassetteSettings');
-                const settings = stored ? JSON.parse(stored) : getDefaultSettings();
-                applySettings(settings);
-                showStatus('Настройки загружены');
+                if (settings) {
+                    applySettings(settings);
+                    // Обновляем localStorage
+                    localStorage.setItem('cassetteSettings', JSON.stringify(settings));
+                    showStatus('Настройки загружены из файла');
+                } else {
+                    // Fallback на localStorage
+                    const stored = localStorage.getItem('cassetteSettings');
+                    const fallbackSettings = stored ? JSON.parse(stored) : getDefaultSettings();
+                    applySettings(fallbackSettings);
+                    showStatus('Настройки загружены из кэша', false);
+                }
             } catch (e) {
-                showStatus('Ошибка загрузки: ' + e, true);
+                // Fallback на localStorage при ошибке
+                const stored = localStorage.getItem('cassetteSettings');
+                const fallbackSettings = stored ? JSON.parse(stored) : getDefaultSettings();
+                applySettings(fallbackSettings);
+                showStatus('Настройки загружены из кэша (ошибка API: ' + e + ')', false);
             }
         }
 
@@ -414,7 +429,9 @@
         }
 
         // Загружаем настройки при старте
-        document.addEventListener('DOMContentLoaded', loadSettings);
+        window.addEventListener('load', function() {
+            loadSettings();
+        });
     </script>
 </body>
 </html>
