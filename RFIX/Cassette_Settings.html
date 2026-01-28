@@ -405,7 +405,7 @@
                     applySettings(settings);
                     // Обновляем localStorage
                     localStorage.setItem('cassetteSettings', JSON.stringify(settings));
-                    showStatus('Настройки загружены');
+                    showStatus('Настройки загружены из файла');
                 } else {
                     // Fallback на localStorage
                     const stored = localStorage.getItem('cassetteSettings');

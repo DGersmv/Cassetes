@@ -215,7 +215,9 @@ void BrowserRepl::RegisterACAPIJavaScriptObject(DG::Browser& browser)
         if (GS::Ref<JS::Object> jsParam = GS::DynamicCast<JS::Object>(param)) {
             const GS::HashTable<GS::UniString, GS::Ref<JS::Base>>& itemTable = jsParam->GetItemTable();
             
+            // Загружаем существующие настройки, чтобы не потерять не переданные поля
             CassetteSettings::Settings settings;
+            CassetteSettings::LoadSettings(settings);
             
             // Основные настройки
             GS::Ref<JS::Base> item;
