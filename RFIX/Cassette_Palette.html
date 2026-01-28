@@ -529,12 +529,28 @@
         // Загрузить настройки из файла
         async function loadSettings() {
             try {
-                if (!window.ACAPI || !window.ACAPI.GetCassetteSettings) {
-                    console.warn('ACAPI.GetCassetteSettings не доступен, используются значения по умолчанию');
-                    return;
+                let settings = null;
+                
+                // Пытаемся загрузить через ACAPI
+                if (window.ACAPI && window.ACAPI.GetCassetteSettings) {
+                    try {
+                        settings = await window.ACAPI.GetCassetteSettings();
+                    } catch (e) {
+                        console.warn('Ошибка при загрузке через ACAPI, пробуем localStorage:', e);
+                    }
                 }
                 
-                const settings = await window.ACAPI.GetCassetteSettings();
+                // Если ACAPI не доступен или не вернул данные, пробуем localStorage
+                if (!settings) {
+                    const stored = localStorage.getItem('cassetteSettings');
+                    if (stored) {
+                        settings = JSON.parse(stored);
+                        console.log('Настройки загружены из localStorage');
+                    } else {
+                        console.warn('Настройки не найдены, используются значения по умолчанию');
+                        return;
+                    }
+                }
                 
                 if (settings) {
                     // Применяем настройки к полям ввода
@@ -572,7 +588,7 @@
                     }
                     
                     // Загружаем высоту этажа из настроек (ID стены)
-                    if (settings.wallIdForFloorHeight) {
+                    if (settings.wallIdForFloorHeight && window.ACAPI && window.ACAPI.GetFloorHeightFromWall) {
                         try {
                             const result = await window.ACAPI.GetFloorHeightFromWall(settings.wallIdForFloorHeight);
                             if (result && result.found && result.height > 0) {
