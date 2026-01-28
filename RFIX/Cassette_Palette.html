@@ -238,6 +238,13 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Кнопка обновления настроек -->
+        <div style="margin-top: 10px;">
+            <button class="btn btn-secondary" onclick="loadSettings()" style="padding:6px 12px;font-size:11px;">
+                🔄 Обновить настройки
+            </button>
+        </div>
     </div>
 
     <!-- Окна/Двери -->
@@ -516,6 +523,66 @@
             if (statusEl) {
                 statusEl.textContent = message;
                 statusEl.className = isError ? 'status error' : 'status success';
+            }
+        }
+
+        // Загрузить настройки из файла
+        async function loadSettings() {
+            try {
+                if (!window.ACAPI || !window.ACAPI.GetCassetteSettings) {
+                    console.warn('ACAPI.GetCassetteSettings недоступен, используются значения по умолчанию');
+                    return;
+                }
+                
+                const settings = await window.ACAPI.GetCassetteSettings();
+                
+                if (settings) {
+                    // Параметры для типа 0
+                    if (settings.type0) {
+                        document.getElementById('plankWidth0').value = settings.type0.plankWidth || 285;
+                        document.getElementById('slopeWidth0').value = settings.type0.slopeWidth || 285;
+                    }
+                    
+                    // Параметры для типов 1-2
+                    if (settings.type1_2) {
+                        document.getElementById('plankWidth12').value = settings.type1_2.plankWidth || 160;
+                        document.getElementById('slopeWidth12').value = settings.type1_2.slopeWidth || 225;
+                        document.getElementById('offsetX').value = settings.type1_2.offsetX || 165;
+                        document.getElementById('offsetY').value = settings.type1_2.offsetY || 50;
+                        document.getElementById('offsetTop').value = settings.type1_2.x2Coeff || 745;
+                    }
+                    
+                    // ID целевых объектов для типа 0
+                    if (settings.type0) {
+                        document.getElementById('plankId0').value = settings.type0.plankId || 'OK-0_PLNK';
+                        document.getElementById('leftSlopeId0').value = settings.type0.leftSlopeId || 'OK-0_LOTK';
+                        document.getElementById('rightSlopeId0').value = settings.type0.rightSlopeId || 'OK-0_ROTK';
+                    }
+                    
+                    // ID целевых объектов для типов 1-2
+                    if (settings.type1_2) {
+                        document.getElementById('cassetteId12').value = settings.type1_2.cassetteId || 'OK-1_2_CASS';
+                        document.getElementById('plankId12').value = settings.type1_2.plankId || 'OK-1_2_PLNK';
+                        document.getElementById('leftSlopeId12').value = settings.type1_2.leftSlopeId || 'OK-1_2_LOTK';
+                        document.getElementById('rightSlopeId12').value = settings.type1_2.rightSlopeId || 'OK-1_2_ROTK';
+                    }
+                    
+                    // Загружаем высоту этажа
+                    if (settings.wallIdForFloorHeight) {
+                        try {
+                            const result = await window.ACAPI.GetFloorHeightFromWall(settings.wallIdForFloorHeight);
+                            if (result && result.found && result.height > 0) {
+                                document.getElementById('floorHeight').value = result.height.toFixed(2);
+                            }
+                        } catch (e) {
+                            console.warn('Не удалось загрузить высоту этажа:', e);
+                        }
+                    }
+                    
+                    console.log('Настройки успешно загружены');
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки настроек:', e);
             }
         }
 
@@ -853,8 +920,10 @@
         }
 
         // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
-            // Все элементы видны по умолчанию
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Загружаем настройки при запуске
+            await loadSettings();
+            console.log('Главная палитра инициализирована');
         });
     </script>
 </body>
