@@ -242,7 +242,7 @@
         <!-- Кнопка обновления настроек -->
         <div style="margin-top: 10px;">
             <button class="btn btn-secondary" onclick="loadSettings()" style="padding:6px 12px;font-size:11px;">
-                🔄 Обновить настройки из файла
+                🔄 Перезагрузить настройки
             </button>
         </div>
     </div>
@@ -526,7 +526,7 @@
             }
         }
 
-        // Загрузить настройки из файла
+        // Загрузить настройки
         async function loadSettings() {
             try {
                 let settings = null;
@@ -566,7 +566,8 @@
                         document.getElementById('plankWidth12').value = settings.type1_2.plankWidth || 160;
                         document.getElementById('slopeWidth12').value = settings.type1_2.slopeWidth || 225;
                         
-                        // Общие параметры берём из настроек типа 1-2
+                        // Общие параметры (offsetX, offsetY, offsetTop) всегда берём из настроек типа 1-2,
+                        // т.к. в UI это общие поля для всех типов
                         document.getElementById('offsetX').value = settings.type1_2.offsetX || 165;
                         document.getElementById('offsetY').value = settings.type1_2.offsetY || 50;
                         document.getElementById('offsetTop').value = settings.type1_2.x2Coeff || 745;
@@ -587,7 +588,7 @@
                         document.getElementById('rightSlopeId12').value = settings.type1_2.rightSlopeId || 'OK-1_2_ROTK';
                     }
                     
-                    // Загружаем высоту этажа из настроек (ID стены)
+                    // Загружаем высоту этажа из стены по ID из настроек
                     if (settings.wallIdForFloorHeight && window.ACAPI && window.ACAPI.GetFloorHeightFromWall) {
                         try {
                             const result = await window.ACAPI.GetFloorHeightFromWall(settings.wallIdForFloorHeight);
