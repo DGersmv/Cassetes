@@ -132,9 +132,12 @@ void CassetteSettingsPalette::PanelResized(const DG::PanelResizeEvent& /*ev*/)
     short width = GetClientWidth();
     short height = GetClientHeight();
     
-    // Перемещаем браузер в начало и задаём размер равный клиентской области
-    browser.Move(0, 0);
-    browser.Resize(width, height);
+    if (width > 0 && height > 0) {
+        browser.SetPosition(0, 0);
+        browser.SetWidth(width);
+        browser.SetHeight(height);
+        browser.Redraw();
+    }
 }
 
 void CassetteSettingsPalette::PanelCloseRequested(const DG::PanelCloseRequestEvent& /*ev*/, 
