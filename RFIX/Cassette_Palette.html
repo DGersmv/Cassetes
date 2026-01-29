@@ -692,9 +692,6 @@
                 offsetTop: parseInt(document.getElementById('offsetTop').value) || 745
             };
             
-            // ТЕСТ: показываем что отправляем в C++
-            alert('Отправляем в C++: floorHeight = ' + params.floorHeight);
-            
             try {
                 // Вызываем C++ функцию расчёта
                 const result = await window.ACAPI.CalculateCassettes({ 

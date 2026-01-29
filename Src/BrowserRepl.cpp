@@ -355,12 +355,6 @@ void BrowserRepl::RegisterACAPIJavaScriptObject(DG::Browser& browser)
                 }
             }
             
-            // Отладка: выводим что получили от JavaScript
-            char debugMsg[256];
-            std::sprintf(debugMsg, "C++ получил от JS: floorHeight=%.3f, offsetTop=%d, windows=%d", 
-                         params.floorHeight, params.offsetTop, static_cast<int>(windows.GetSize()));
-            ACAPI_WriteReport(debugMsg, false);
-            
             // Выполняем расчёт
             CassetteHelper::CalculationResult calcResult = 
                 CassetteHelper::Calculate(windows, params);

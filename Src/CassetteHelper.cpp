@@ -369,10 +369,6 @@ CalculationResult Calculate(
             int cassetteY = static_cast<int>(w.width * 1000) + params.offsetY;
             cassetteGroups[{cassetteX, cassetteY}]++;
             
-            char debugMsg[256];
-            std::sprintf(debugMsg, "Кассета НИЖНЯЯ: %dx%d (sillHeight=%.3f)", cassetteX, cassetteY, w.sillHeight);
-            ACAPI_WriteReport(debugMsg, false);
-            
             // Для типа 2 добавляем вторую (верхнюю) кассету
             if (w.calcType == 2) {
                 // X2 = I2*1000 - (190 + C*1000 + D*1000 + 20) + offsetTop
@@ -380,9 +376,6 @@ CalculationResult Calculate(
                     - (190 + static_cast<int>(w.height * 1000) + static_cast<int>(w.sillHeight * 1000) + 20) 
                     + params.offsetTop;
                 cassetteGroups[{cassetteX2, cassetteY}]++;
-                
-                std::sprintf(debugMsg, "Кассета ВЕРХНЯЯ: %dx%d (floorHeight=%.3f)", cassetteX2, cassetteY, params.floorHeight);
-                ACAPI_WriteReport(debugMsg, false);
             }
         }
     }
