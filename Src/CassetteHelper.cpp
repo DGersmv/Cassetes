@@ -372,6 +372,11 @@ CalculationResult Calculate(
             // Для типа 2 добавляем вторую (верхнюю) кассету
             if (w.calcType == 2) {
                 // X2 = I2*1000 - (190 + C*1000 + D*1000 + 20) + offsetTop
+                // Отладка: выводим значение floorHeight
+                char debugMsg[256];
+                std::sprintf(debugMsg, "Calculate: floorHeight=%.3f, offsetTop=%d", params.floorHeight, params.offsetTop);
+                ACAPI_WriteReport(debugMsg, false);
+                
                 int cassetteX2 = static_cast<int>(params.floorHeight * 1000) 
                     - (190 + static_cast<int>(w.height * 1000) + static_cast<int>(w.sillHeight * 1000) + 20) 
                     + params.offsetTop;
