@@ -364,19 +364,25 @@ CalculationResult Calculate(
         
         // Расчёт кассет (только для типов 1 и 2)
         if (w.calcType == 1 || w.calcType == 2) {
-            // X = D * 1000 + offsetX, Y = B * 1000 + offsetY
-            int cassetteX = static_cast<int>(w.sillHeight * 1000) + params.offsetX;
+            // Y одинаковый для всех кассет: Y = B * 1000 + offsetY
             int cassetteY = static_cast<int>(w.width * 1000) + params.offsetY;
-            cassetteGroups[{cassetteX, cassetteY}]++;
             
-            // Для типа 2 добавляем вторую (верхнюю) кассету
+            // Тип 1: ТОЛЬКО верхняя кассета
+            // Тип 2: нижняя + верхняя кассеты
+            
+            // Нижняя кассета (только для типа 2)
             if (w.calcType == 2) {
-                // X2 = I2*1000 - (190 + C*1000 + D*1000 + 20) + offsetTop
-                int cassetteX2 = static_cast<int>(params.floorHeight * 1000) 
-                    - (190 + static_cast<int>(w.height * 1000) + static_cast<int>(w.sillHeight * 1000) + 20) 
-                    + params.offsetTop;
-                cassetteGroups[{cassetteX2, cassetteY}]++;
+                // X = D * 1000 + offsetX
+                int cassetteX = static_cast<int>(w.sillHeight * 1000) + params.offsetX;
+                cassetteGroups[{cassetteX, cassetteY}]++;
             }
+            
+            // Верхняя кассета (для типов 1 и 2)
+            // X2 = I2*1000 - (190 + C*1000 + D*1000 + 20) + offsetTop
+            int cassetteX2 = static_cast<int>(params.floorHeight * 1000) 
+                - (190 + static_cast<int>(w.height * 1000) + static_cast<int>(w.sillHeight * 1000) + 20) 
+                + params.offsetTop;
+            cassetteGroups[{cassetteX2, cassetteY}]++;
         }
     }
     
