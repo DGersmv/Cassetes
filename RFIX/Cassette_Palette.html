@@ -18,24 +18,31 @@
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: 12px;
-            background: #e0e0e0; /* Темнее фон снаружи */
+            background: #e0e0e0;
             color: #2f2f2f;
-            margin: 0;
+            overflow: auto;
+            display: block;
+        }
+        .palette-wrapper {
+            min-height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
             padding: 20px;
-            text-align: center; /* Центрирование инлайн-блоков */
-            min-width: 560px; /* Чтобы скролл появлялся раньше, чем контент обрежется */
             box-sizing: border-box;
         }
         .palette {
-            width: 520px; /* Фиксированная ширина */
-            margin: 0 auto; /* Центрирование блока */
-            background: #ffffff; /* Белый фон для "листа" */
+            width: 520px;
+            min-width: 520px;
+            background: #ffffff;
             border: 1px solid #c0c0c0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Тень почетче */
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             padding: 20px;
             box-sizing: border-box;
-            text-align: left; /* Возвращаем выравнивание текста влево внутри палитры */
-            border-radius: 4px;
+            text-align: left;
+            flex-shrink: 0; 
         }
         h1 {
             margin: 0 0 8px;
@@ -211,6 +218,7 @@
     </style>
 </head>
 <body>
+    <div class="palette-wrapper">
     <div class="palette">
     <h1>Кассеты — расчёт</h1>
     <!-- Параметры -->
@@ -1024,6 +1032,7 @@
             }
         });
     </script>
+    </div>
 </div>
 </body>
 </html>
