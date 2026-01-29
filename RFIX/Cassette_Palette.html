@@ -12,24 +12,23 @@
         }
         html, body {
             height: 100%;
-            width: 100%;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            overflow-y: auto;
         }
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: 12px;
-            background: #f5f5f5;
+            background: #ffffff;
             color: #2f2f2f;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         .palette {
-            width: 100%;
-            min-height: 100%;
-            margin: 0;
+            width: 490px;
+            margin: 0 auto;
             background: #ffffff;
             padding: 15px;
             box-sizing: border-box;
@@ -71,20 +70,17 @@
         .param-row {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             margin-top: 6px;
-            flex-wrap: wrap;
         }
         .param-row label {
-            min-width: 120px;
-            max-width: 160px;
+            width: 140px;
             flex-shrink: 0;
             font-size: 11px;
         }
         .param-row input,
         .param-row select {
             flex: 1;
-            min-width: 60px;
             padding: 4px;
             border: 1px solid #ada9a4;
             border-radius: 2px;
@@ -182,8 +178,8 @@
             background: #ffffff;
             border: 1px solid #c7c3bd;
             padding: 8px;
-            flex: 1 1 180px;
-            min-width: 150px;
+            flex: 1 1 200px;
+            min-width: 180px;
         }
         .result-block h4 {
             font-size: 11px;
@@ -204,12 +200,11 @@
         }
         .two-columns {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
         }
         .two-columns > div {
-            flex: 1 1 180px;
-            min-width: 150px;
+            flex: 1 1 200px;
         }
     </style>
 </head>
