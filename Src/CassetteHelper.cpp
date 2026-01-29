@@ -16,21 +16,48 @@ namespace CassetteHelper {
 // =============================================================================
 
 // Определить тип расчёта из ID элемента
+// Смотрим на конец строки: ":0" или ": 0" → тип 0, ":1" или ": 1" → тип 1, ":2" или ": 2" → тип 2
 int GetCalcTypeFromId(const GS::UniString& id)
 {
-    // Ищем паттерны ОК-0, ОК-1, ОК-2, ДВ-0, ДВ-1, ДВ-2
-    if (id.Contains("ОК-0") || id.Contains("OK-0") || 
-        id.Contains("ДВ-0") || id.Contains("DV-0")) {
+    // Убираем пробелы в конце строки для надёжности
+    GS::UniString trimmedId = id;
+    while (trimmedId.GetLength() > 0 && trimmedId[trimmedId.GetLength() - 1] == ' ') {
+        trimmedId.DeleteLast();
+    }
+    
+    if (trimmedId.GetLength() < 2) {
+        return -1;
+    }
+    
+    // Проверяем последний символ (должен быть 0, 1 или 2)
+    GS::UniChar lastChar = trimmedId[trimmedId.GetLength() - 1];
+    
+    // Проверяем предпоследний символ (должен быть ':' или ': ')
+    GS::UniChar prevChar = trimmedId[trimmedId.GetLength() - 2];
+    
+    bool hasColon = (prevChar == ':');
+    
+    // Если предпоследний - пробел, проверяем символ перед ним
+    if (!hasColon && prevChar == ' ' && trimmedId.GetLength() >= 3) {
+        GS::UniChar prevPrevChar = trimmedId[trimmedId.GetLength() - 3];
+        hasColon = (prevPrevChar == ':');
+    }
+    
+    if (!hasColon) {
+        return -1;
+    }
+    
+    // Определяем тип по последнему символу
+    if (lastChar == '0') {
         return 0;
     }
-    if (id.Contains("ОК-1") || id.Contains("OK-1") || 
-        id.Contains("ДВ-1") || id.Contains("DV-1")) {
+    if (lastChar == '1') {
         return 1;
     }
-    if (id.Contains("ОК-2") || id.Contains("OK-2") || 
-        id.Contains("ДВ-2") || id.Contains("DV-2")) {
+    if (lastChar == '2') {
         return 2;
     }
+    
     return -1; // Неизвестный тип
 }
 
