@@ -14,31 +14,43 @@
             height: 100%;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             font-size: 12px;
-            background: #f5f5f5;
-            color: #333;
+            background: #efefef;
+            color: #2f2f2f;
             margin: 0;
-            padding: 10px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            min-height: 100%;
+            padding: 12px 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .palette {
+            width: 520px;
+            max-width: calc(100% - 24px);
+            background: #efefef;
+            border: 1px solid #a6a3a0;
+            box-shadow: inset 0 0 0 1px #f8f8f8;
+            padding: 12px;
+            box-sizing: border-box;
+            font-size: 12px;
+            line-height: 1.35;
+        }
+        h1 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 600;
         }
         .section {
-            background: white;
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            max-width: 100%;
-            min-width: 0;
+            margin-bottom: 12px;
         }
         .section-title {
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #555;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: #4f4d4a;
+            margin-bottom: 6px;
         }
         .radio-group {
             display: flex;
@@ -52,70 +64,61 @@
             cursor: pointer;
         }
         .params-grid {
-            display: block;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
         .param-row {
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
-            gap: 6px;
-            width: 100%;
+            gap: 8px;
+            margin-top: 6px;
         }
         .param-row label {
-            min-width: 0;
+            width: 140px;
             font-size: 11px;
-            flex: 0 1 140px;
         }
         .param-row input,
         .param-row select {
-            width: 100%;
-            min-width: 0;
-            padding: 4px 6px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            flex: 1 1 140px;
+            flex: 1;
+            padding: 4px;
+            border: 1px solid #ada9a4;
+            border-radius: 2px;
+            background: #ffffff;
+            box-sizing: border-box;
+            font-size: 12px;
+        }
+        .param-row input[type="number"] {
+            text-align: center;
         }
         .param-row span {
             font-size: 10px;
             color: #888;
             white-space: nowrap;
-            flex: 0 0 auto;
-        }
-        .param-row button {
-            flex: 0 0 auto;
         }
         .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            display: inline-block;
+            padding: 4px 10px;
+            border: 1px solid #a8a5a2;
+            border-radius: 2px;
+            background: #dcd9d4;
+            color: #2f2f2f;
             font-size: 12px;
-            transition: background 0.2s;
+            cursor: pointer;
+            box-shadow: inset 0 1px 0 #f5f4f2;
+            min-width: 70px;
+            text-align: center;
         }
-        .btn-primary {
-            background: #007bff;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #0056b3;
-        }
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #1e7e34;
-        }
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background: #545b62;
-        }
+        .btn:hover { background: #e7e4de; }
+        .btn:active { background: #cac7c2; }
         .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+            background: #e2e0de;
+            color: #8a8a8a;
+            cursor: default;
+        }
+        .btn-primary,
+        .btn-success {
+            font-weight: 600;
         }
         .buttons {
             display: flex;
@@ -125,21 +128,26 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
+            font-size: 12px;
             table-layout: fixed;
         }
         th, td {
-            padding: 6px 8px;
+            padding: 4px 6px;
+            border-bottom: 1px solid #e0ddd8;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            vertical-align: top;
             word-break: break-word;
         }
         th {
-            background: #f8f9fa;
-            font-weight: 600;
+            background: #dedbd5;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.4px;
         }
         .table-container {
-            max-height: 150px;
+            border: 1px solid #c7c3bd;
+            background: #ffffff;
+            max-height: 200px;
             overflow: auto;
         }
         .duplicate {
@@ -148,8 +156,12 @@
         }
         .status {
             font-size: 11px;
-            color: #666;
-            margin-top: 5px;
+            margin-top: 6px;
+            padding: 6px;
+            border: 1px solid #c0beb9;
+            background: #f9f8f6;
+            min-height: 28px;
+            white-space: pre-wrap;
         }
         .status.error {
             color: #c62828;
@@ -158,14 +170,16 @@
             color: #2e7d32;
         }
         .results-grid {
-            display: block;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         .result-block {
-            background: #f8f9fa;
-            border-radius: 4px;
+            background: #ffffff;
+            border: 1px solid #c7c3bd;
             padding: 8px;
-            min-width: 0;
-            margin-bottom: 10px;
+            flex: 1 1 230px;
+            min-width: 200px;
         }
         .result-block h4 {
             font-size: 11px;
@@ -184,15 +198,19 @@
         .hidden {
             display: none;
         }
-        #targetIds .param-row input {
-            width: 100%;
+        .two-columns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .two-col-grid {
-            display: block;
+        .two-columns > div {
+            flex: 1 1 220px;
         }
     </style>
 </head>
 <body>
+    <div class="palette">
+    <h1>Кассеты — расчёт</h1>
     <!-- Параметры -->
     <div class="section">
         <div class="section-title">Параметры</div>
@@ -311,7 +329,7 @@
             <!-- Объекты для типа 0 -->
             <div style="margin-bottom: 10px;">
                 <div style="font-weight: bold; margin-bottom: 5px; font-size: 10px; color: #666;">Объекты для типа 0:</div>
-                <div id="targetIds0" class="two-col-grid">
+                <div id="targetIds0" class="two-columns">
                     <div class="param-row">
                         <label style="min-width: 80px;">Планки:</label>
                         <input type="text" id="plankId0" value="OK-0_PLNK" style="flex: 1;">
@@ -330,7 +348,7 @@
             <!-- Объекты для типов 1-2 -->
             <div>
                 <div style="font-weight: bold; margin-bottom: 5px; font-size: 10px; color: #666;">Объекты для типов 1-2:</div>
-                <div id="targetIds12" class="two-col-grid">
+                <div id="targetIds12" class="two-columns">
                     <div class="param-row">
                         <label style="min-width: 80px;">Кассеты:</label>
                         <input type="text" id="cassetteId12" value="OK-1_2_CASS" style="flex: 1;">
@@ -1004,5 +1022,6 @@
             }
         });
     </script>
+</div>
 </body>
 </html>

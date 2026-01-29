@@ -16,7 +16,7 @@
 
 /* --- Cassette Palette (расчёт) --- */
 
-'GDLG'  32710    Palette | topCaption | close | grow   100   100  550  600  "Кассеты - Расчёт"  {
+'GDLG'  32710    Palette | topCaption | close | grow   100   100  520  720  "Кассеты - Расчёт"  {
 /* [  1] */ Browser         0   0  550  600
 }
 
@@ -26,7 +26,7 @@
 
 /* --- Cassette Settings Palette (настройки) --- */
 
-'GDLG'  32720    Palette | topCaption | close | grow   150   150  450  500  "Кассеты - Настройки"  {
+'GDLG'  32720    Palette | topCaption | close | grow   150   150  420  620  "Кассеты - Настройки"  {
 /* [  1] */ Browser         0   0  450  500
 }
 
