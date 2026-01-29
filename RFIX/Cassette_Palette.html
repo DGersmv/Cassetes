@@ -675,8 +675,6 @@
             let floorHeightStr = floorHeightRaw.replace(',', '.');
             let floorHeightVal = parseFloat(floorHeightStr);
             
-            // Отладка - показываем что прочитали
-            alert('floorHeight: raw="' + floorHeightRaw + '", parsed=' + floorHeightVal);
             
             if (isNaN(floorHeightVal) || floorHeightVal <= 0) {
                 floorHeightVal = 2.99;
@@ -713,7 +711,8 @@
                     displayResults();
                     document.getElementById('writeBtn').disabled = false;
                     document.getElementById('exportBtn').disabled = false;
-                    document.getElementById('resultsStatus').textContent = 'Расчёт выполнен успешно';
+                    // Показываем какой floorHeight использовался
+                    document.getElementById('resultsStatus').textContent = 'Расчёт выполнен (высота этажа: ' + floorHeightVal.toFixed(3) + ' м)';
                     document.getElementById('resultsStatus').className = 'status success';
                 } else {
                     document.getElementById('resultsStatus').textContent = 
