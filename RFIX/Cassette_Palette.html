@@ -670,17 +670,27 @@
                 return;
             }
             
+            // Читаем значение высоты этажа и конвертируем запятую в точку
+            let floorHeightStr = document.getElementById('floorHeight').value.replace(',', '.');
+            let floorHeightVal = parseFloat(floorHeightStr);
+            if (isNaN(floorHeightVal) || floorHeightVal <= 0) {
+                floorHeightVal = 2.99;
+            }
+            
             const params = {
                 type: 3,  // Type1And2 - обрабатываем все элементы
-                floorHeight: parseFloat(document.getElementById('floorHeight').value),
-                plankWidth0: parseInt(document.getElementById('plankWidth0').value),
-                slopeWidth0: parseInt(document.getElementById('slopeWidth0').value),
-                plankWidth12: parseInt(document.getElementById('plankWidth12').value),
-                slopeWidth12: parseInt(document.getElementById('slopeWidth12').value),
-                offsetX: parseInt(document.getElementById('offsetX').value),
-                offsetY: parseInt(document.getElementById('offsetY').value),
-                offsetTop: parseInt(document.getElementById('offsetTop').value)
+                floorHeight: floorHeightVal,
+                plankWidth0: parseInt(document.getElementById('plankWidth0').value) || 285,
+                slopeWidth0: parseInt(document.getElementById('slopeWidth0').value) || 285,
+                plankWidth12: parseInt(document.getElementById('plankWidth12').value) || 160,
+                slopeWidth12: parseInt(document.getElementById('slopeWidth12').value) || 225,
+                offsetX: parseInt(document.getElementById('offsetX').value) || 165,
+                offsetY: parseInt(document.getElementById('offsetY').value) || 50,
+                offsetTop: parseInt(document.getElementById('offsetTop').value) || 745
             };
+            
+            console.log('Calculate params:', params);
+            console.log('floorHeight value:', floorHeightVal);
             
             try {
                 // Вызываем C++ функцию расчёта

@@ -333,25 +333,25 @@ void BrowserRepl::RegisterACAPIJavaScriptObject(DG::Browser& browser)
                 }
             }
             
-            // Получаем параметры расчёта
-            CassetteHelper::CalcParams params;
+            // Получаем параметры расчёта (инициализируем значениями по умолчанию)
+            CassetteHelper::CalcParams params = CassetteHelper::GetDefaultParams(CassetteHelper::CalcType::Type1And2);
             GS::Ref<JS::Base> paramsBase;
             if (itemTable.Get("params", &paramsBase)) {
                 if (GS::Ref<JS::Object> jsParams = GS::DynamicCast<JS::Object>(paramsBase)) {
                     const GS::HashTable<GS::UniString, GS::Ref<JS::Base>>& paramsTable = jsParams->GetItemTable();
                     GS::Ref<JS::Base> item;
                     if (paramsTable.Get("type", &item)) params.type = static_cast<CassetteHelper::CalcType>(GetIntFromJs(item));
-                    if (paramsTable.Get("floorHeight", &item)) params.floorHeight = GetDoubleFromJs(item);
+                    if (paramsTable.Get("floorHeight", &item)) params.floorHeight = GetDoubleFromJs(item, 2.99);
                     // Параметры для типа 0
-                    if (paramsTable.Get("plankWidth0", &item)) params.plankWidth0 = GetIntFromJs(item); else params.plankWidth0 = 285;
-                    if (paramsTable.Get("slopeWidth0", &item)) params.slopeWidth0 = GetIntFromJs(item); else params.slopeWidth0 = 285;
+                    if (paramsTable.Get("plankWidth0", &item)) params.plankWidth0 = GetIntFromJs(item, 285);
+                    if (paramsTable.Get("slopeWidth0", &item)) params.slopeWidth0 = GetIntFromJs(item, 285);
                     // Параметры для типов 1-2
-                    if (paramsTable.Get("plankWidth12", &item)) params.plankWidth12 = GetIntFromJs(item); else params.plankWidth12 = 160;
-                    if (paramsTable.Get("slopeWidth12", &item)) params.slopeWidth12 = GetIntFromJs(item); else params.slopeWidth12 = 225;
+                    if (paramsTable.Get("plankWidth12", &item)) params.plankWidth12 = GetIntFromJs(item, 160);
+                    if (paramsTable.Get("slopeWidth12", &item)) params.slopeWidth12 = GetIntFromJs(item, 225);
                     // Общие параметры
-                    if (paramsTable.Get("offsetX", &item)) params.offsetX = GetIntFromJs(item);
-                    if (paramsTable.Get("offsetY", &item)) params.offsetY = GetIntFromJs(item);
-                    if (paramsTable.Get("offsetTop", &item)) params.offsetTop = GetIntFromJs(item); else params.offsetTop = 745;
+                    if (paramsTable.Get("offsetX", &item)) params.offsetX = GetIntFromJs(item, 165);
+                    if (paramsTable.Get("offsetY", &item)) params.offsetY = GetIntFromJs(item, 50);
+                    if (paramsTable.Get("offsetTop", &item)) params.offsetTop = GetIntFromJs(item, 745);
                 }
             }
             
