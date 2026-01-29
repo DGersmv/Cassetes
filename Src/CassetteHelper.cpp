@@ -323,6 +323,12 @@ CalculationResult Calculate(
     const GS::Array<WindowDoorInfo>& windows,
     const CalcParams& params)
 {
+    // Отладка: выводим параметры в начале расчёта
+    char debugMsg[256];
+    std::sprintf(debugMsg, "=== Calculate START: floorHeight=%.3f, windows=%d ===", 
+                 params.floorHeight, static_cast<int>(windows.GetSize()));
+    ACAPI_WriteReport(debugMsg, false);
+    
     CalculationResult result;
     result.success = true;
     
