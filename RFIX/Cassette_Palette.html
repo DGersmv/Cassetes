@@ -225,7 +225,7 @@
             <div class="params-grid">
                 <div class="param-row">
                     <label>Высота этажа:</label>
-                    <input type="number" id="floorHeight" value="2.99" step="0.1">
+                    <input type="text" id="floorHeight" value="2.99" style="text-align:center;">
                     <span>м</span>
                     <button class="btn btn-secondary" onclick="loadFloorHeight()" style="padding:4px 8px;font-size:10px;">↻</button>
                 </div>
@@ -671,8 +671,13 @@
             }
             
             // Читаем значение высоты этажа и конвертируем запятую в точку
-            let floorHeightStr = document.getElementById('floorHeight').value.replace(',', '.');
+            let floorHeightRaw = document.getElementById('floorHeight').value;
+            let floorHeightStr = floorHeightRaw.replace(',', '.');
             let floorHeightVal = parseFloat(floorHeightStr);
+            
+            // Отладка - показываем что прочитали
+            alert('floorHeight: raw="' + floorHeightRaw + '", parsed=' + floorHeightVal);
+            
             if (isNaN(floorHeightVal) || floorHeightVal <= 0) {
                 floorHeightVal = 2.99;
             }
@@ -688,9 +693,6 @@
                 offsetY: parseInt(document.getElementById('offsetY').value) || 50,
                 offsetTop: parseInt(document.getElementById('offsetTop').value) || 745
             };
-            
-            console.log('Calculate params:', params);
-            console.log('floorHeight value:', floorHeightVal);
             
             try {
                 // Вызываем C++ функцию расчёта
