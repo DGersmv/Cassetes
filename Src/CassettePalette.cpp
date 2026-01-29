@@ -126,12 +126,14 @@ void CassettePalette::SetMenuItemCheckedState(bool isChecked)
 // DG Event Handlers
 // =============================================================================
 
-void CassettePalette::PanelResized(const DG::PanelResizeEvent& ev)
+void CassettePalette::PanelResized(const DG::PanelResizeEvent& /*ev*/)
 {
-    // Растягиваем браузер на всю палитру
-    short width = ev.GetHorizontalChange() + GetOriginalClientWidth();
-    short height = ev.GetVerticalChange() + GetOriginalClientHeight();
+    // Растягиваем браузер на всю клиентскую область палитры
+    short width = GetClientWidth();
+    short height = GetClientHeight();
     
+    // Перемещаем браузер в начало и задаём размер равный клиентской области
+    browser.Move(0, 0);
     browser.Resize(width, height);
 }
 

@@ -17,7 +17,7 @@
 /* --- Cassette Palette (расчёт) --- */
 
 'GDLG'  32710    Palette | topCaption | close | grow   100   100  520  720  "Кассеты - Расчёт"  {
-/* [  1] */ Browser         0   0  550  600
+/* [  1] */ Browser         0   0  520  720
 }
 
 'DLGH'  32710  DLG_32710_Cassette_Browser {
@@ -27,7 +27,7 @@
 /* --- Cassette Settings Palette (настройки) --- */
 
 'GDLG'  32720    Palette | topCaption | close | grow   150   150  420  620  "Кассеты - Настройки"  {
-/* [  1] */ Browser         0   0  450  500
+/* [  1] */ Browser         0   0  420  620
 }
 
 'DLGH'  32720  DLG_32720_CassetteSettings_Browser {
