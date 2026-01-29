@@ -12,30 +12,38 @@
         }
         html, body {
             height: 100%;
+            margin: 0;
+            padding: 0;
         }
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: 12px;
             background: #efefef;
             color: #2f2f2f;
-            margin: 0;
-            padding: 12px;
-            overflow: auto;
-            text-align: center;
-            min-width: 520px;
+            
+            /* Центрирование рабочей области */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Прижимаем к верху, чтобы скролл работал корректно */
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
         }
         .palette {
+            /* Фиксированная рабочая область */
             width: 520px;
             min-width: 520px;
+            max-width: 520px;
+            flex-shrink: 0; /* Запрещаем сжиматься меньше 520px */
+            
             background: #efefef;
             border: 1px solid #a6a3a0;
-            box-shadow: inset 0 0 0 1px #f8f8f8;
-            padding: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            padding: 15px;
             box-sizing: border-box;
+            
             font-size: 12px;
             line-height: 1.35;
-            margin: 0 auto;
-            display: inline-block;
             text-align: left;
         }
         h1 {
