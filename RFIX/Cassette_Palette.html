@@ -12,30 +12,28 @@
         }
         html, body {
             height: 100%;
+            width: 100%;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: 12px;
-            background: #e0e0e0; /* Темнее фон снаружи */
+            background: #f5f5f5;
             color: #2f2f2f;
             margin: 0;
-            padding: 20px;
-            text-align: center; /* Центрирование инлайн-блоков */
-            min-width: 560px; /* Чтобы скролл появлялся раньше, чем контент обрежется */
+            padding: 0;
             box-sizing: border-box;
         }
         .palette {
-            width: 520px; /* Фиксированная ширина */
-            margin: 0 auto; /* Центрирование блока */
-            background: #ffffff; /* Белый фон для "листа" */
-            border: 1px solid #c0c0c0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Тень почетче */
-            padding: 20px;
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+            background: #ffffff;
+            padding: 15px;
             box-sizing: border-box;
-            text-align: left; /* Возвращаем выравнивание текста влево внутри палитры */
-            border-radius: 4px;
+            text-align: left;
         }
         h1 {
             margin: 0 0 8px;
@@ -73,16 +71,20 @@
         .param-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             margin-top: 6px;
+            flex-wrap: wrap;
         }
         .param-row label {
-            width: 140px;
+            min-width: 120px;
+            max-width: 160px;
+            flex-shrink: 0;
             font-size: 11px;
         }
         .param-row input,
         .param-row select {
             flex: 1;
+            min-width: 60px;
             padding: 4px;
             border: 1px solid #ada9a4;
             border-radius: 2px;
@@ -180,8 +182,8 @@
             background: #ffffff;
             border: 1px solid #c7c3bd;
             padding: 8px;
-            flex: 1 1 230px;
-            min-width: 200px;
+            flex: 1 1 180px;
+            min-width: 150px;
         }
         .result-block h4 {
             font-size: 11px;
@@ -202,11 +204,12 @@
         }
         .two-columns {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
         .two-columns > div {
-            flex: 1 1 220px;
+            flex: 1 1 180px;
+            min-width: 150px;
         }
     </style>
 </head>
