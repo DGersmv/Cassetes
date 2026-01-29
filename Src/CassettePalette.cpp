@@ -40,9 +40,6 @@ CassettePalette::CassettePalette() :
     Attach(*this);
     BeginEventProcessing();
     
-    // Устанавливаем минимальный размер палитры (ширина контента + padding)
-    SetMinSize(520, 400);
-    
     // Регистрируем JS API
     BrowserRepl::RegisterACAPIJavaScriptObject(browser);
     
