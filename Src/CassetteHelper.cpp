@@ -215,16 +215,80 @@ GS::Array<WindowDoorInfo> GetSelectedWindowsDoors()
 }
 
 // =============================================================================
-// GetFloorHeightFromWall - получить высоту этажа (упрощённая версия)
+// GetFloorHeightFromWall - получить высоту стены по ID
 // =============================================================================
-// Теперь просто возвращает значение по умолчанию 2.99 м (2990 мм)
-// Высоту можно изменить вручную через UI
-// Параметр wallIdPattern игнорируется, но оставлен для совместимости
+// Ищет стену, ID которой содержит заданный паттерн, и возвращает её высоту
 
 double GetFloorHeightFromWall(const GS::UniString& wallIdPattern)
 {
-    // Возвращаем значение по умолчанию 2.99 м (2990 мм)
-    return 2.99;
+    if (wallIdPattern.IsEmpty()) {
+        return 0.0;
+    }
+    
+    // Получаем список всех стен в проекте
+    GS::Array<API_Guid> wallGuids;
+    GSErrCode err = ACAPI_Element_GetElemList(API_WallID, &wallGuids);
+    if (err != NoError || wallGuids.IsEmpty()) {
+        return 0.0;
+    }
+    
+    // Ищем стену с нужным ID
+    for (const API_Guid& guid : wallGuids) {
+        API_Element element = {};
+        element.header.guid = guid;
+        
+        err = ACAPI_Element_Get(&element);
+        if (err != NoError) continue;
+        
+        // Получаем ID стены через свойства
+        GS::Array<API_PropertyDefinition> definitions;
+        err = ACAPI_Element_GetPropertyDefinitions(guid, API_PropertyDefinitionFilter_UserDefined, definitions);
+        
+        for (const API_PropertyDefinition& def : definitions) {
+            if (def.name.Contains("ID") || def.name.Contains("id") || 
+                def.name.Contains("ИД") || def.name.Contains("идентификатор")) {
+                API_Property property;
+                err = ACAPI_Element_GetPropertyValue(guid, def.guid, property);
+                if (err == NoError && property.isDefault == false) {
+                    if (property.value.singleVariant.variant.type == API_PropertyStringValueType) {
+                        GS::UniString wallId = property.value.singleVariant.variant.uniStringValue;
+                        
+                        // Проверяем, содержит ли ID паттерн
+                        if (wallId.Contains(wallIdPattern)) {
+                            // Нашли стену! Возвращаем её высоту в метрах
+                            double wallHeight = element.wall.height;
+                            return wallHeight;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Также проверяем все свойства, если не нашли в пользовательских
+        err = ACAPI_Element_GetPropertyDefinitions(guid, API_PropertyDefinitionFilter_All, definitions);
+        for (const API_PropertyDefinition& def : definitions) {
+            if (def.name.Contains("ID") || def.name.Contains("id") || 
+                def.name.Contains("ИД") || def.name.Contains("идентификатор")) {
+                API_Property property;
+                err = ACAPI_Element_GetPropertyValue(guid, def.guid, property);
+                if (err == NoError && property.isDefault == false) {
+                    if (property.value.singleVariant.variant.type == API_PropertyStringValueType) {
+                        GS::UniString wallId = property.value.singleVariant.variant.uniStringValue;
+                        
+                        // Проверяем, содержит ли ID паттерн
+                        if (wallId.Contains(wallIdPattern)) {
+                            // Нашли стену! Возвращаем её высоту в метрах
+                            double wallHeight = element.wall.height;
+                            return wallHeight;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Стена не найдена
+    return 0.0;
 }
 
 // =============================================================================
