@@ -12,30 +12,28 @@
         }
         html, body {
             height: 100%;
+            width: 100%;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: 12px;
-            background: #e0e0e0;
+            background: #f5f5f5;
             color: #2f2f2f;
             margin: 0;
-            padding: 20px;
-            text-align: center;
-            min-width: 460px;
+            padding: 0;
             box-sizing: border-box;
         }
         .palette {
-            width: 420px;
-            margin: 0 auto;
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
             background: #ffffff;
-            border: 1px solid #c0c0c0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            padding: 20px;
+            padding: 15px;
             box-sizing: border-box;
             text-align: left;
-            border-radius: 4px;
         }
         h1 {
             margin: 0 0 8px;
@@ -62,17 +60,21 @@
         .param-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             margin-top: 6px;
+            flex-wrap: wrap;
         }
         .param-row label {
-            width: 150px;
+            min-width: 120px;
+            max-width: 180px;
+            flex-shrink: 0;
             font-size: 11px;
         }
         .param-row input[type="number"],
         .param-row input[type="text"],
         .param-row select {
             flex: 1;
+            min-width: 80px;
             padding: 4px;
             border: 1px solid #ada9a4;
             border-radius: 2px;
